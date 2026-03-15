@@ -1,0 +1,547 @@
+module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo = {}, formModelos = [], formMateriais = []) {
+    
+    // 1. Gerador de Notícias
+    const noticiasSlides = noticias.map(item => `
+        <div class="swiper-slide bg-white p-8 rounded-3xl shadow-lg border border-gray-100 cursor-pointer hover:shadow-xl transition-shadow" onclick="openModal('${item.titulo}', '${item.descricao.replace(/'/g, "\\'")}')">
+            <span class="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${item.tipo === 'promocao' ? 'bg-brandLight text-brand' : 'bg-gray-100 text-gray-600'}">${item.tipo}</span>
+            <h4 class="text-2xl font-black mt-2 text-gray-800 leading-tight">${item.titulo}</h4>
+            <p class="text-gray-500 mt-3 truncate">${item.descricao}</p>
+            <div class="mt-6 flex items-center text-brand font-bold">Ler mais <i class="fa-solid fa-chevron-right ml-2 text-sm"></i></div>
+        </div>
+    `).join('');
+
+    // 2. Gerador Dinâmico de Cards de Produtos
+    const renderCaixaCard = (p) => `
+        <div class="swiper-slide bg-white overflow-hidden border border-gray-100 flex flex-col h-full rounded-3xl shadow-sm">
+            <div class="relative h-64 md:h-56 overflow-hidden">
+                <img src="${p.imagem_url}" class="w-full h-full object-cover transform hover:scale-110 transition duration-700" alt="${p.titulo}">
+            </div>
+            <div class="p-6 md:p-8 text-center flex-grow flex flex-col justify-center">
+                <h4 class="text-xl md:text-2xl font-black text-gray-900">${p.titulo}</h4>
+                <p class="mt-2 md:mt-3 text-gray-500 text-sm">${p.descricao}</p>
+            </div>
+        </div>
+    `;
+
+    // Filtramos os produtos do banco para cada slider
+    let destaquesCards = produtos.filter(p => p.secao === 'destaque').map(renderCaixaCard).join('');
+    let alimenticioCards = produtos.filter(p => p.secao === 'alimenticio').map(renderCaixaCard).join('');
+    let industrialCards = produtos.filter(p => p.secao === 'industrial').map(renderCaixaCard).join('');
+
+    // Duplicamos as variáveis HTML para garantir que o Loop infinito do Swiper sempre funcione, mesmo com poucas caixas cadastradas
+    if(destaquesCards) destaquesCards += destaquesCards;
+    if(alimenticioCards) alimenticioCards += alimenticioCards;
+    if(industrialCards) industrialCards += industrialCards;
+
+    // Fallbacks (Caso o usuário apague todos os itens do painel admin, mostramos avisos no lugar de um espaço quebrado)
+    const fallbackHTML = `<div class="swiper-slide bg-gray-50 p-10 text-center rounded-3xl border border-gray-200"><i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-bold">Nenhum modelo cadastrado nesta seção.</p></div>`;
+    
+    // Tratamento dos textos da Empresa
+    const tituloEmpresa = empresaInfo.titulo || 'Nossa Raiz, Nossa Força';
+    const textoEmpresa = empresaInfo.texto_historia ? empresaInfo.texto_historia.replace(/\n/g, '<br><br>') : 'A história da nossa fábrica será contada aqui em breve.';
+    
+    // Tratamento dos números de estatísticas
+    const anosAlvo = stats.anos_historia || 0;
+    const caixasAlvo = stats.caixas_vendidas ? Math.floor(stats.caixas_vendidas / 1000000) : 0; 
+
+    return `
+    <!DOCTYPE html>
+    <html lang="pt-BR" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ecocaixas | A Força da Embalagem</title>
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: { brand: '#029723', brandDark: '#015e15', brandLight: '#e6f5e9', darkBg: '#0a1910' },
+                        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], }
+                    }
+                }
+            }
+        </script>
+
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        <style>
+            body { font-family: 'Inter', sans-serif; background-color: #fbfbfb; overflow-x: hidden; }
+            
+            .swiper-button-next, .swiper-button-prev { color: #029723 !important; background: white !important; width: 45px !important; height: 45px !important; border-radius: 50%; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 50 !important; }
+            .swiper-button-next:after, .swiper-button-prev:after { font-size: 20px !important; font-weight: bold; }
+            .swiper-pagination-bullet-active { background-color: #029723 !important; }
+            
+            .productSwiper { padding: 50px 0; }
+            .productSwiper .swiper-slide { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform: scale(0.85); opacity: 0.4; border-radius: 2rem; }
+            .productSwiper .swiper-slide-active { transform: scale(1.05); opacity: 1; z-index: 10; box-shadow: 0 25px 50px -12px rgba(2, 151, 35, 0.15); }
+            .catalogoSwiper { padding: 20px 0 50px 0; }
+            
+            input, select, textarea { transition: all 0.3s ease; }
+            input:focus, select:focus, textarea:focus { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(2, 151, 35, 0.1); }
+
+            .mosaico-container { position: relative; width: 100%; }
+            .mosaico-img { position: absolute; transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); border-radius: 1.5rem; object-fit: cover; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+            .slot-1 { top: 0; left: 0; width: 100%; height: 58%; z-index: 10; }
+            .slot-2 { bottom: 0; left: 0; width: 48%; height: 38%; z-index: 1; }
+            .slot-3 { bottom: 0; right: 0; width: 48%; height: 38%; z-index: 1; }
+        </style>
+    </head>
+    <body class="text-gray-800 antialiased selection:bg-brand selection:text-white">
+
+        <header class="bg-white/80 backdrop-blur-lg border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="bg-brand text-white p-2 rounded-xl mr-3 shadow-lg shadow-brand/30"><i class="fa-solid fa-leaf text-xl"></i></div>
+                    <h1 class="text-2xl font-black tracking-tighter text-gray-900">Ecocaixas</h1>
+                </div>
+                <nav class="hidden lg:flex space-x-8 font-semibold items-center text-sm text-gray-600">
+                    <a href="#produtos" class="hover:text-brand transition">Destaques</a>
+                    <a href="#setores" class="hover:text-brand transition">Setores</a>
+                    <a href="#catalogo" class="hover:text-brand transition">Catálogo</a>
+                    <a href="#sobre" class="hover:text-brand transition">A Fábrica</a>
+                    <a href="#contato" class="bg-brand text-white px-6 py-2.5 rounded-full hover:bg-brandDark hover:shadow-lg hover:shadow-brand/30 transition-all transform hover:-translate-y-0.5">Criar Orçamento</a>
+                </nav>
+            </div>
+        </header>
+
+        <section id="produtos" class="relative pt-20 pb-28 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80" class="w-full h-full object-cover opacity-40" alt="Fábrica">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#fbfbfb]/60 to-gray-50"></div>
+            </div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-10" data-aos="fade-down" data-aos-duration="1000">
+                    <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Destaques da Linha</span>
+                    <h2 class="text-4xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">Embalagens que <br class="md:hidden"><span class="text-brand">protegem</span> o seu negócio.</h2>
+                </div>
+                
+                <div class="swiper productSwiper" data-aos="zoom-in" data-aos-delay="200" data-aos-duration="1200">
+                    <div class="swiper-wrapper">
+                        ${destaquesCards || fallbackHTML}
+                    </div>
+                    <div class="swiper-pagination mt-10"></div>
+                    <div class="swiper-button-next hidden md:flex"></div>
+                    <div class="swiper-button-prev hidden md:flex"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="setores" class="py-20 bg-white relative">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-5xl font-black text-gray-900 mb-16 text-center tracking-tight" data-aos="fade-up">Feito para o seu setor.</h2>
+                <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 hover:bg-brandLight transition-colors duration-500 group" data-aos="fade-right" data-aos-duration="1000">
+                        <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center text-4xl mb-8 text-brand transform group-hover:-translate-y-2 transition-transform duration-300"><i class="fa-solid fa-burger"></i></div>
+                        <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Alimentício</h3>
+                        <p class="text-gray-600 mb-8 leading-relaxed">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 hover:bg-gray-100 transition-colors duration-500 group" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center text-4xl mb-8 text-gray-800 transform group-hover:-translate-y-2 transition-transform duration-300"><i class="fa-solid fa-industry"></i></div>
+                        <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Industrial</h3>
+                        <p class="text-gray-600 mb-8 leading-relaxed">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="catalogo" class="py-24 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Nosso Portfólio</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Catálogo de Produtos</h2>
+                </div>
+
+                <div class="mb-20" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="text-2xl font-black text-brand mb-6 flex items-center border-l-4 border-brand pl-4"><i class="fa-solid fa-utensils mr-3"></i> Linha Alimentícia</h3>
+                    <div class="relative">
+                        <div class="swiper catalogoSwiper swiperAlimentos">
+                            <div class="swiper-wrapper">
+                                ${alimenticioCards || fallbackHTML}
+                            </div>
+                            <div class="swiper-pagination mt-4 relative"></div>
+                        </div>
+                        <div class="swiper-button-next alimentos-next hidden md:flex absolute top-1/2 -right-5 transform -translate-y-1/2 z-10"></div>
+                        <div class="swiper-button-prev alimentos-prev hidden md:flex absolute top-1/2 -left-5 transform -translate-y-1/2 z-10"></div>
+                    </div>
+                </div>
+
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center border-l-4 border-gray-800 pl-4"><i class="fa-solid fa-pallet mr-3"></i> Linha Industrial</h3>
+                    <div class="relative">
+                        <div class="swiper catalogoSwiper swiperIndustrial">
+                            <div class="swiper-wrapper">
+                                ${industrialCards || fallbackHTML}
+                            </div>
+                            <div class="swiper-pagination mt-4 relative"></div>
+                        </div>
+                        <div class="swiper-button-next ind-next hidden md:flex absolute top-1/2 -right-5 transform -translate-y-1/2 z-10"></div>
+                        <div class="swiper-button-prev ind-prev hidden md:flex absolute top-1/2 -left-5 transform -translate-y-1/2 z-10"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre" class="py-24 bg-darkBg text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mr-40 -mt-40 w-96 h-96 rounded-full bg-brand opacity-20 blur-[100px]"></div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-6 py-2 rounded-full text-sm font-bold tracking-widest uppercase mb-6">
+                        <i class="fa-solid fa-location-dot mr-2 text-brand"></i> Polo Industrial, Camaçari - BA
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">O Motor Sustentável da Bahia.</h2>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+                    <div data-aos="fade-right" data-aos-duration="1000">
+                        <h3 class="text-3xl font-bold mb-6 text-white border-l-4 border-brand pl-4">${tituloEmpresa}</h3>
+                        <div class="space-y-6 text-gray-300 text-lg leading-relaxed text-justify mb-10">
+                            <p>${textoEmpresa}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6" id="stats-container">
+                            <div class="bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur hover:bg-white/10 transition-colors text-center">
+                                <div class="text-5xl md:text-6xl font-black mb-2 text-brand flex justify-center">
+                                    <span class="contador" data-target="${anosAlvo}">0</span>
+                                </div>
+                                <span class="text-sm font-bold uppercase tracking-widest text-gray-400">Anos de História</span>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur hover:bg-white/10 transition-colors text-center">
+                                <div class="text-5xl md:text-6xl font-black mb-2 text-brand flex justify-center items-center">
+                                    <span class="contador" data-target="${caixasAlvo}">0</span>
+                                    <span class="text-4xl ml-1">M+</span>
+                                </div>
+                                <span class="text-sm font-bold uppercase tracking-widest text-gray-400">Caixas Produzidas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mosaico-container h-80 md:h-[500px]" data-aos="fade-left" data-aos-duration="1200">
+                        <img id="mosaico-1" src="${empresaInfo.img_mosaico_1 || 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&h=800&fit=crop'}" class="mosaico-img slot-1">
+                        <img id="mosaico-2" src="${empresaInfo.img_mosaico_2 || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=400&fit=crop'}" class="mosaico-img slot-2">
+                        <img id="mosaico-3" src="${empresaInfo.img_mosaico_3 || 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?w=500&h=400&fit=crop'}" class="mosaico-img slot-3">
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-brand to-brandDark rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden max-w-5xl mx-auto" data-aos="fade-up">
+                    <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                        <div class="md:w-1/3 text-white">
+                            <h3 class="text-3xl font-black mb-4 leading-tight">Mural da Fábrica</h3>
+                            <p class="text-brandLight text-sm opacity-90">Deslize para ver novidades, recados da diretoria e promoções.</p>
+                        </div>
+                        <div class="md:w-2/3 w-full">
+                            <div class="swiper newsSwiper">
+                                <div class="swiper-wrapper pb-10">
+                                    ${noticiasSlides || '<div class="swiper-slide bg-white/20 p-6 rounded-3xl text-white text-center backdrop-blur">Nenhuma atualização no momento.</div>'}
+                                </div>
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contato" class="py-24 bg-gray-50 relative">
+            <div class="container mx-auto px-6 max-w-4xl relative z-10">
+                <div class="text-center mb-16" data-aos="fade-down">
+                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Monte seu Pedido</h2>
+                    <p class="text-gray-500 text-lg">Processo rápido e direto para o WhatsApp do seu setor em Camaçari.</p>
+                </div>
+
+                <form id="formContato" class="bg-white p-6 md:p-12 rounded-[2.5rem] shadow-xl shadow-gray-200/50" onsubmit="prepararEnvio(event)" data-aos="fade-up" data-aos-delay="200">
+                    
+                    <div class="mb-10">
+                        <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span> Dados da Empresa</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nome da Empresa</label>
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Seu Nome e Contato</label>
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instagram (Opcional)</label>
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="instagram" placeholder="@suaempresa">
+                                <label class="flex items-center text-sm text-gray-500 mt-3 cursor-pointer select-none">
+                                    <input type="checkbox" id="checkInsta" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-4 h-4" onchange="toggleField('instagram', this.checked)"> Não possuo
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Site / App (Opcional)</label>
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="site" placeholder="www.suaempresa.com.br">
+                                <label class="flex items-center text-sm text-gray-500 mt-3 cursor-pointer select-none">
+                                    <input type="checkbox" id="checkSite" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-4 h-4" onchange="toggleField('site', this.checked)"> Não possuo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span> Direcionamento</h3>
+                        <div class="bg-brandLight/50 p-6 rounded-3xl border border-brand/20">
+                            <label class="block text-sm font-bold text-gray-900 mb-3">Qual o Segmento Principal da sua Empresa?</label>
+                            <select class="w-full bg-white px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-800" id="setorPrincipal" required>
+                                <option value="" disabled selected>Selecione uma opção...</option>
+                                <option value="alimenticio">Ramo Alimentício</option>
+                                <option value="industrial">Ramo Industrial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-black text-gray-900 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span> Itens do Pedido</h3>
+                            <button type="button" onclick="abrirModalCaixa()" class="bg-gray-900 text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-brand transition-colors flex items-center shadow-md">
+                                <i class="fa-solid fa-plus mr-2"></i> Caixa
+                            </button>
+                        </div>
+                        <div id="listaPedidos" class="space-y-4">
+                            <div class="text-center p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-gray-400 font-medium" id="emptyState">
+                                Seu carrinho está vazio. Adicione os modelos de caixa acima.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
+                        <textarea class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-[#25D366] hover:bg-[#1fae53] text-white font-black py-5 rounded-full transition-all transform hover:-translate-y-1 shadow-xl shadow-green-500/30 text-lg flex justify-center items-center">
+                        <i class="fa-brands fa-whatsapp text-2xl mr-3"></i> Enviar Pedido via WhatsApp
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <a href="https://wa.me/5571900000000" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#1fae53] transition-all z-40 transform hover:scale-110 flex items-center justify-center h-16 w-16"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
+
+        <div id="modalCaixa" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center transition-opacity opacity-0" style="transition: opacity 0.3s ease;">
+            <div class="bg-white rounded-[2rem] max-w-md w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalCaixaContent">
+                <button onclick="fecharModalCaixa()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                <h3 class="text-2xl font-black text-gray-900 mb-6 tracking-tight">Nova Caixa</h3>
+                <form id="formAddCaixa" onsubmit="salvarItem(event)">
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Setor da Caixa</label>
+                        <select id="itemSetor" class="w-full bg-gray-50 px-4 py-3 rounded-xl ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-900" onchange="atualizarOpcoes()" required>
+                            <option value="" disabled selected>Escolha o setor...</option><option value="alimenticio">Alimentício</option><option value="industrial">Industrial</option>
+                        </select>
+                    </div>
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Modelo</label>
+                        <select id="itemModelo" class="w-full bg-gray-50 px-4 py-3 rounded-xl ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-900 disabled:opacity-50" onchange="atualizarTamanhoAuto()" required disabled><option value="" disabled selected>Selecione o setor...</option></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tamanho</label><input type="text" id="itemTamanho" class="w-full bg-gray-100 px-4 py-3 rounded-xl ring-1 ring-gray-200 text-gray-500 font-bold cursor-not-allowed" readonly required></div>
+                        <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Qtd</label><input type="number" id="itemQtd" class="w-full bg-gray-50 px-4 py-3 rounded-xl ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-900" placeholder="5000" min="1" required></div>
+                    </div>
+                    <div class="mb-8">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Papelão</label>
+                        <select id="itemMaterial" class="w-full bg-gray-50 px-4 py-3 rounded-xl ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-900 disabled:opacity-50" required disabled><option value="" disabled selected>Selecione o setor...</option></select>
+                    </div>
+                    <button type="submit" class="w-full bg-gray-900 text-white font-black py-4 rounded-xl hover:bg-brand transition-colors shadow-lg">Adicionar Caixa</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="newsModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center transition-opacity opacity-0" style="transition: opacity 0.3s ease;">
+            <div class="bg-white rounded-[2rem] max-w-lg w-full p-8 md:p-10 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+                <button onclick="closeModal()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                <h3 id="modalTitle" class="text-3xl font-black text-gray-900 mb-4">Título</h3>
+                <p id="modalDesc" class="text-gray-600 leading-relaxed text-lg">Descrição</p>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        
+        <script>
+            // INJETANDO DADOS DINÂMICOS DO BANCO
+            const dbModelos = ${JSON.stringify(formModelos)};
+            const dbMateriais = ${JSON.stringify(formMateriais)};
+
+            AOS.init({ once: false, mirror: true, offset: 80 });
+
+            setInterval(() => {
+                const img1 = document.getElementById('mosaico-1'); const img2 = document.getElementById('mosaico-2'); const img3 = document.getElementById('mosaico-3');
+                if(img1 && img2 && img3) {
+                    const cls1 = img1.className.match(/slot-\\d/)[0]; const cls2 = img2.className.match(/slot-\\d/)[0]; const cls3 = img3.className.match(/slot-\\d/)[0];
+                    img1.classList.replace(cls1, cls2); img2.classList.replace(cls2, cls3); img3.classList.replace(cls3, cls1);
+                }
+            }, 2500);
+
+            new Swiper('.productSwiper', {
+                slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true,
+                autoplay: { delay: 3000, disableOnInteraction: false },
+                navigation: { nextEl: '.productSwiper .swiper-button-next', prevEl: '.productSwiper .swiper-button-prev' },
+                pagination: { el: '.productSwiper .swiper-pagination', clickable: true },
+                breakpoints: { 768: { slidesPerView: 2, spaceBetween: 30 }, 1024: { slidesPerView: 3, spaceBetween: 40 } }
+            });
+
+            new Swiper('.swiperAlimentos', {
+                slidesPerView: 1, spaceBetween: 20, loop: true,
+                autoplay: { delay: 3000, disableOnInteraction: false },
+                navigation: { nextEl: '.alimentos-next', prevEl: '.alimentos-prev' },
+                pagination: { el: '.swiperAlimentos .swiper-pagination', clickable: true },
+                breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
+            });
+
+            new Swiper('.swiperIndustrial', {
+                slidesPerView: 1, spaceBetween: 20, loop: true,
+                autoplay: { delay: 3000, disableOnInteraction: false, reverseDirection: true },
+                navigation: { nextEl: '.ind-next', prevEl: '.ind-prev' },
+                pagination: { el: '.swiperIndustrial .swiper-pagination', clickable: true },
+                breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
+            });
+            
+            new Swiper('.newsSwiper', { 
+                slidesPerView: 1, spaceBetween: 20, loop: true,
+                autoplay: { delay: 3000, disableOnInteraction: false }, 
+                pagination: { el: '.newsSwiper .swiper-pagination', clickable: true } 
+            });
+
+            const counters = document.querySelectorAll('.contador'); let hasAnimated = false;
+            const animateCounters = () => {
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target'); const increment = target / 100;
+                    let currentCount = 0;
+                    const updateCount = () => {
+                        currentCount += increment;
+                        if (currentCount < target) { counter.innerText = Math.ceil(currentCount); requestAnimationFrame(updateCount); } 
+                        else { counter.innerText = target; }
+                    }; updateCount();
+                });
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                if(entries[0].isIntersecting && !hasAnimated) { animateCounters(); hasAnimated = true; }
+            }, { threshold: 0.5 });
+            const statsContainer = document.getElementById('stats-container');
+            if(statsContainer) observer.observe(statsContainer);
+
+            function toggleField(fieldId, isChecked) {
+                const field = document.getElementById(fieldId);
+                field.disabled = isChecked; if(isChecked) field.value = '';
+            }
+
+            let itensOrcamento = [];
+
+            function abrirModalCaixa() {
+                document.getElementById('formAddCaixa').reset();
+                document.getElementById('itemModelo').disabled = true; 
+                document.getElementById('itemMaterial').disabled = true;
+                document.getElementById('itemModelo').innerHTML = '<option value="" disabled selected>Selecione o setor...</option>';
+                document.getElementById('itemMaterial').innerHTML = '<option value="" disabled selected>Selecione o setor...</option>';
+                document.getElementById('itemTamanho').value = ''; 
+                const modal = document.getElementById('modalCaixa'); const content = document.getElementById('modalCaixaContent');
+                modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalCaixa() { 
+                const modal = document.getElementById('modalCaixa'); const content = document.getElementById('modalCaixaContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95'); setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            function atualizarOpcoes() {
+                const setor = document.getElementById('itemSetor').value;
+                const selectModelo = document.getElementById('itemModelo');
+                const selectMaterial = document.getElementById('itemMaterial');
+                
+                document.getElementById('itemTamanho').value = ''; 
+                selectModelo.innerHTML = '<option value="" disabled selected>Escolha o modelo...</option>';
+                selectMaterial.innerHTML = '<option value="" disabled selected>Escolha o material...</option>';
+                
+                if(setor) {
+                    selectModelo.disabled = false;
+                    selectMaterial.disabled = false;
+                    
+                    const modelosFiltrados = dbModelos.filter(m => m.secao === setor);
+                    if(modelosFiltrados.length === 0) selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
+                    modelosFiltrados.forEach(mod => { selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}</option>\`; });
+
+                    const materiaisFiltrados = dbMateriais.filter(m => m.secao === setor || m.secao === 'ambos');
+                    if(materiaisFiltrados.length === 0) selectMaterial.innerHTML = '<option value="" disabled>Nenhum material cadastrado.</option>';
+                    materiaisFiltrados.forEach(mat => { selectMaterial.innerHTML += \`<option value="\${mat.nome}">\${mat.nome}</option>\`; });
+                }
+            }
+
+            function atualizarTamanhoAuto() {
+                const selectModelo = document.getElementById('itemModelo'); 
+                const opcaoSelecionada = selectModelo.options[selectModelo.selectedIndex];
+                document.getElementById('itemTamanho').value = opcaoSelecionada.getAttribute('data-tamanho') || '';
+            }
+
+            function salvarItem(e) {
+                e.preventDefault();
+                const item = {
+                    setor: document.getElementById('itemSetor').options[document.getElementById('itemSetor').selectedIndex].text,
+                    modelo: document.getElementById('itemModelo').value, tamanho: document.getElementById('itemTamanho').value,
+                    qtd: document.getElementById('itemQtd').value, material: document.getElementById('itemMaterial').value
+                };
+                itensOrcamento.push(item); renderizarLista(); fecharModalCaixa();
+            }
+
+            function removerItem(index) { itensOrcamento.splice(index, 1); renderizarLista(); }
+
+            function renderizarLista() {
+                const container = document.getElementById('listaPedidos'); const emptyState = document.getElementById('emptyState');
+                if(itensOrcamento.length === 0) { container.innerHTML = ''; container.appendChild(emptyState); emptyState.style.display = 'block'; return; }
+                emptyState.style.display = 'none'; let html = '';
+                itensOrcamento.forEach((item, index) => {
+                    html += \`
+                    <div class="bg-white p-5 border border-gray-100 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full \${item.setor.includes('Alimentício') ? 'bg-brandLight text-brand' : 'bg-gray-100 text-gray-800'} flex items-center justify-center text-xl"><i class="fa-solid fa-box"></i></div>
+                            <div>
+                                <p class="font-black text-gray-900 text-lg">\${item.qtd}x \${item.modelo}</p>
+                                <p class="text-sm text-gray-500 font-medium">\${item.tamanho} • \${item.material}</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removerItem(\${index})" class="w-full md:w-auto bg-red-50 text-red-500 hover:bg-red-100 px-4 py-2 rounded-full font-bold transition-colors text-sm"><i class="fa-solid fa-trash mr-2"></i> Remover</button>
+                    </div>\`;
+                });
+                container.innerHTML = html;
+            }
+
+            function prepararEnvio(event) {
+                event.preventDefault();
+                if(itensOrcamento.length === 0) return alert("Adicione pelo menos uma caixa ao carrinho.");
+                const empresa = document.getElementById('empresa').value; const contato = document.getElementById('contatoNome').value;
+                const insta = document.getElementById('checkInsta').checked ? 'Não possui' : (document.getElementById('instagram').value || 'Não informado');
+                const site = document.getElementById('checkSite').checked ? 'Não possui' : (document.getElementById('site').value || 'Não informado');
+                const obs = document.getElementById('descricaoGeral').value || 'Nenhuma observação adicional.';
+                const setorPrincipal = document.getElementById('setorPrincipal').value;
+
+                let textoItens = '';
+                itensOrcamento.forEach((item, i) => { textoItens += \`\\n📦 *Item \${i+1}*:\\n- Modelo: \${item.modelo} (\${item.setor})\\n- Tamanho: \${item.tamanho}\\n- Quantidade: \${item.qtd}\\n- Material: \${item.material}\\n\`; });
+
+                let numeroWhatsApp = setorPrincipal === 'alimenticio' ? '5571999999991' : '5571999999992';
+                const textoFinal = \`*NOVO ORÇAMENTO - ECOCAIXAS* 🏭\\n--------------------------------\\n*Empresa:* \${empresa}\\n*Contato:* \${contato}\\n*Instagram:* \${insta}\\n*Site/App:* \${site}\\n\\n*🛒 ITENS DO PEDIDO:* \${textoItens}\\n*📝 Observações:* \${obs}\`;
+                window.open(\`https://wa.me/\${numeroWhatsApp}?text=\${encodeURIComponent(textoFinal)}\`, '_blank');
+            }
+
+            function openModal(title, desc) {
+                document.getElementById('modalTitle').innerText = title; document.getElementById('modalDesc').innerText = desc;
+                const m = document.getElementById('newsModal'), c = document.getElementById('modalContent');
+                m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 10);
+            }
+            function closeModal() {
+                const m = document.getElementById('newsModal'), c = document.getElementById('modalContent');
+                m.classList.add('opacity-0'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
+            }
+        </script>
+    </body>
+    </html>
+    `;
+};
