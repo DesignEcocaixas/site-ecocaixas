@@ -7,7 +7,7 @@ const renderHome = require('./views/homeView');
 const renderAdmin = require('./views/adminView'); 
 
 const app = express();
-const port = 3000;
+const port = 3054;
 
 // ==========================================
 // CONFIGURAÇÃO DE UPLOAD DE IMAGENS (MULTER)
