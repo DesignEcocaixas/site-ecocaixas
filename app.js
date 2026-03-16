@@ -57,7 +57,7 @@ app.get('/', async (req, res) => {
 
         // Tratamento caso o banco esteja vazio
         const info = empresaInfo[0] || {};
-        const st = stats[0] || { anos_historia: 15, caixas_vendidas: 8000000 };
+        const st = stats[0] || { anos_historia: 11, caixas_vendidas: 8000000 };
 
         // Passamos os 6 conjuntos de dados para o homeView.js
         const html = renderHome(st, noticias, produtos, info, formModelos, formMateriais);
@@ -244,7 +244,7 @@ app.post('/admin/form/material/delete/:id', async (req, res) => {
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
-app.listen(port, () => {
+app.listen(port, '0.0.0.0',() => {
     console.log(`🏭 Servidor da Fábrica rodando em http://localhost:${port}`);
     console.log(`⚙️  Acesso ao Painel: http://localhost:${port}/admin`);
 });

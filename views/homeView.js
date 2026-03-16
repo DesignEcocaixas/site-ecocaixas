@@ -50,7 +50,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Ecocaixas | A Força da Embalagem</title>
+        <meta name="description" content="Fábrica de caixas de papelão em Camaçari - BA. Soluções em embalagens para o ramo alimentício e industrial. Solicite seu orçamento direto da fábrica.">
+        <meta name="keywords" content="caixas de papelão, fábrica de caixas, Camaçari, Bahia, embalagens de papelão, caixa maleta, caixa corte e vinco">
+        <meta name="robots" content="index, follow">
+        <title>Ecocaixas | Caixas de papelão personalizadas</title>
         
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -96,9 +99,8 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
         <header class="bg-white/80 backdrop-blur-lg border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <div class="bg-brand text-white p-2 rounded-xl mr-3 shadow-lg shadow-brand/30"><i class="fa-solid fa-leaf text-xl"></i></div>
-                    <h1 class="text-2xl font-black tracking-tighter text-gray-900">Ecocaixas</h1>
-                </div>
+                <img src="/logo.png" alt="Logo Ecocaixas" class="h-12 w-auto">
+            </div>
                 <nav class="hidden lg:flex space-x-8 font-semibold items-center text-sm text-gray-600">
                     <a href="#produtos" class="hover:text-brand transition">Destaques</a>
                     <a href="#setores" class="hover:text-brand transition">Setores</a>
@@ -193,9 +195,9 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             <div class="container mx-auto px-6 relative z-10">
                 <div class="text-center mb-16" data-aos="fade-up">
                     <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-6 py-2 rounded-full text-sm font-bold tracking-widest uppercase mb-6">
-                        <i class="fa-solid fa-location-dot mr-2 text-brand"></i> Polo Industrial, Camaçari - BA
+                        <i class="fa-solid fa-location-dot mr-2 text-brand"></i> Camaçari - BA
                     </div>
-                    <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">O Motor Sustentável da Bahia.</h2>
+                    <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">Solidez e tempo de mercado</h2>
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
