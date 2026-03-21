@@ -113,13 +113,13 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
         <section id="produtos" class="relative pt-20 pb-28 overflow-hidden">
             <div class="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1920&q=80" class="w-full h-full object-cover opacity-40" alt="Fábrica">
+                <img src="/fabrica2.png" class="w-full h-full object-cover opacity-100" alt="Fábrica Ecocaixas">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#fbfbfb]/60 to-gray-50"></div>
             </div>
             
             <div class="container mx-auto px-6 relative z-10">
                 <div class="text-center mb-10" data-aos="fade-down" data-aos-duration="1000">
-                    <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Destaques da Linha</span>
+                    <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Destaques da Produção</span>
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">Embalagens que <br class="md:hidden"><span class="text-brand">protegem</span> o seu negócio.</h2>
                 </div>
                 
@@ -138,16 +138,23 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl md:text-5xl font-black text-gray-900 mb-16 text-center tracking-tight" data-aos="fade-up">Feito para o seu setor.</h2>
                 <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
-                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 hover:bg-brandLight transition-colors duration-500 group" data-aos="fade-right" data-aos-duration="1000">
-                        <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center text-4xl mb-8 text-brand transform group-hover:-translate-y-2 transition-transform duration-300"><i class="fa-solid fa-burger"></i></div>
+                    
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 border-2 border-gray-300 hover:bg-brandLight hover:border-brand/40 transition-colors duration-500 group shadow-sm" data-aos="fade-right" data-aos-duration="1000">
+                        <div class="w-20 h-20 bg-white rounded-2xl border border-gray-300 shadow-sm flex items-center justify-center text-4xl mb-8 text-brand transform group-hover:-translate-y-2 transition-transform duration-300">
+                            <i class="fa-solid fa-burger"></i>
+                        </div>
                         <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Alimentício</h3>
                         <p class="text-gray-600 mb-8 leading-relaxed">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
                     </div>
-                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 hover:bg-gray-100 transition-colors duration-500 group" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                        <div class="w-20 h-20 bg-white rounded-2xl shadow-sm flex items-center justify-center text-4xl mb-8 text-gray-800 transform group-hover:-translate-y-2 transition-transform duration-300"><i class="fa-solid fa-industry"></i></div>
+
+                    <div class="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-500 group shadow-sm" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="w-20 h-20 bg-white rounded-2xl border border-gray-300 shadow-sm flex items-center justify-center text-4xl mb-8 text-gray-800 transform group-hover:-translate-y-2 transition-transform duration-300">
+                            <i class="fa-solid fa-industry"></i>
+                        </div>
                         <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Industrial</h3>
                         <p class="text-gray-600 mb-8 leading-relaxed">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -160,8 +167,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 </div>
 
                 <div class="mb-20" data-aos="fade-up" data-aos-delay="100">
-                    <h3 class="text-2xl font-black text-brand mb-6 flex items-center border-l-4 border-brand pl-4"><i class="fa-solid fa-utensils mr-3"></i> Linha Alimentícia</h3>
-                    <div class="relative">
+                    <h3 class="text-2xl font-black text-brand mb-6 flex items-center border-l-4 border-brand pl-4">
+                        <i class="fa-solid fa-utensils mr-3"></i> Linha Alimentícia
+                    </h3>
+                    <div class="relative border-2 border-gray-300 rounded-[2rem] p-4 md:p-6 bg-white shadow-sm">
                         <div class="swiper catalogoSwiper swiperAlimentos">
                             <div class="swiper-wrapper">
                                 ${alimenticioCards || fallbackHTML}
@@ -174,8 +183,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 </div>
 
                 <div data-aos="fade-up" data-aos-delay="200">
-                    <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center border-l-4 border-gray-800 pl-4"><i class="fa-solid fa-pallet mr-3"></i> Linha Industrial</h3>
-                    <div class="relative">
+                    <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center border-l-4 border-gray-800 pl-4">
+                        <i class="fa-solid fa-pallet mr-3"></i> Linha Industrial
+                    </h3>
+                    <div class="relative border-2 border-gray-300 rounded-[2rem] p-4 md:p-6 bg-white shadow-sm">
                         <div class="swiper catalogoSwiper swiperIndustrial">
                             <div class="swiper-wrapper">
                                 ${industrialCards || fallbackHTML}
@@ -197,7 +208,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-6 py-2 rounded-full text-sm font-bold tracking-widest uppercase mb-6">
                         <i class="fa-solid fa-location-dot mr-2 text-brand"></i> Camaçari - BA
                     </div>
-                    <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">Solidez e tempo de mercado</h2>
+                    <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">Sobre a Ecocaixas</h2>
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
@@ -257,31 +268,31 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     <p class="text-gray-500 text-lg">Processo rápido e direto para o WhatsApp do seu setor em Camaçari.</p>
                 </div>
 
-                <form id="formContato" class="bg-white p-6 md:p-12 rounded-[2.5rem] shadow-xl shadow-gray-200/50" onsubmit="prepararEnvio(event)" data-aos="fade-up" data-aos-delay="200">
+                <form id="formContato" class="bg-white p-6 md:p-12 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border-2 border-gray-300" onsubmit="prepararEnvio(event)" data-aos="fade-up" data-aos-delay="200">
                     
                     <div class="mb-10">
                         <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span> Dados da Empresa</h3>
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nome da Empresa</label>
-                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Seu Nome e Contato</label>
-                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
                             </div>
                         </div>
                         <div class="grid md:grid-cols-2 gap-6 mt-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instagram (Opcional)</label>
-                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="instagram" placeholder="@suaempresa">
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="instagram" placeholder="@suaempresa">
                                 <label class="flex items-center text-sm text-gray-500 mt-3 cursor-pointer select-none">
                                     <input type="checkbox" id="checkInsta" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-4 h-4" onchange="toggleField('instagram', this.checked)"> Não possuo
                                 </label>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Site / App (Opcional)</label>
-                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="site" placeholder="www.suaempresa.com.br">
+                                <input class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium disabled:opacity-50" type="text" id="site" placeholder="www.suaempresa.com.br">
                                 <label class="flex items-center text-sm text-gray-500 mt-3 cursor-pointer select-none">
                                     <input type="checkbox" id="checkSite" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-4 h-4" onchange="toggleField('site', this.checked)"> Não possuo
                                 </label>
@@ -291,9 +302,9 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
                     <div class="mb-10">
                         <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span> Direcionamento</h3>
-                        <div class="bg-brandLight/50 p-6 rounded-3xl border border-brand/20">
+                        <div class="bg-brandLight/50 p-6 rounded-3xl border-2 border-brand/30">
                             <label class="block text-sm font-bold text-gray-900 mb-3">Qual o Segmento Principal da sua Empresa?</label>
-                            <select class="w-full bg-white px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand font-medium text-gray-800" id="setorPrincipal" required>
+                            <select class="w-full bg-white px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand font-medium text-gray-800" id="setorPrincipal" required>
                                 <option value="" disabled selected>Selecione uma opção...</option>
                                 <option value="alimenticio">Ramo Alimentício</option>
                                 <option value="industrial">Ramo Industrial</option>
@@ -304,12 +315,12 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     <div class="mb-10">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-black text-gray-900 flex items-center"><span class="bg-gray-100 text-brand w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span> Itens do Pedido</h3>
-                            <button type="button" onclick="abrirModalCaixa()" class="bg-gray-900 text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-brand transition-colors flex items-center shadow-md">
+                            <button type="button" onclick="abrirModalCaixa()" class="bg-gray-900 text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-brand transition-colors flex items-center shadow-md border border-gray-700">
                                 <i class="fa-solid fa-plus mr-2"></i> Caixa
                             </button>
                         </div>
                         <div id="listaPedidos" class="space-y-4">
-                            <div class="text-center p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-gray-400 font-medium" id="emptyState">
+                            <div class="text-center p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-300 text-gray-500 font-medium" id="emptyState">
                                 Seu carrinho está vazio. Adicione os modelos de caixa acima.
                             </div>
                         </div>
@@ -317,17 +328,17 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
                     <div class="mb-10">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
-                        <textarea class="w-full bg-gray-50 px-5 py-4 rounded-2xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-brand focus:bg-white text-gray-900 font-medium" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
+                        <textarea class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#25D366] hover:bg-[#1fae53] text-white font-black py-5 rounded-full transition-all transform hover:-translate-y-1 shadow-xl shadow-green-500/30 text-lg flex justify-center items-center">
+                    <button type="submit" class="w-full bg-[#25D366] hover:bg-[#1fae53] text-white font-black py-5 rounded-full transition-all transform hover:-translate-y-1 shadow-xl shadow-green-500/30 text-lg flex justify-center items-center border-2 border-[#1fae53]">
                         <i class="fa-brands fa-whatsapp text-2xl mr-3"></i> Enviar Pedido via WhatsApp
                     </button>
                 </form>
             </div>
         </section>
 
-        <a href="https://wa.me/5571900000000" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#1fae53] transition-all z-40 transform hover:scale-110 flex items-center justify-center h-16 w-16"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
+        <a href="https://wa.me/5571987780304" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#1fae53] transition-all z-40 transform hover:scale-110 flex items-center justify-center h-16 w-16"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
 
         <div id="modalCaixa" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center transition-opacity opacity-0" style="transition: opacity 0.3s ease;">
             <div class="bg-white rounded-[2rem] max-w-md w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalCaixaContent">
@@ -381,7 +392,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     const cls1 = img1.className.match(/slot-\\d/)[0]; const cls2 = img2.className.match(/slot-\\d/)[0]; const cls3 = img3.className.match(/slot-\\d/)[0];
                     img1.classList.replace(cls1, cls2); img2.classList.replace(cls2, cls3); img3.classList.replace(cls3, cls1);
                 }
-            }, 2500);
+            }, 4000);
 
             new Swiper('.productSwiper', {
                 slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true,
@@ -528,7 +539,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 let textoItens = '';
                 itensOrcamento.forEach((item, i) => { textoItens += \`\\n📦 *Item \${i+1}*:\\n- Modelo: \${item.modelo} (\${item.setor})\\n- Tamanho: \${item.tamanho}\\n- Quantidade: \${item.qtd}\\n- Material: \${item.material}\\n\`; });
 
-                let numeroWhatsApp = setorPrincipal === 'alimenticio' ? '5571999999991' : '5571999999992';
+                let numeroWhatsApp = setorPrincipal === 'alimenticio' ? '5571987780304' : '5571999317529';
                 const textoFinal = \`*NOVO ORÇAMENTO - ECOCAIXAS* 🏭\\n--------------------------------\\n*Empresa:* \${empresa}\\n*Contato:* \${contato}\\n*Instagram:* \${insta}\\n*Site/App:* \${site}\\n\\n*🛒 ITENS DO PEDIDO:* \${textoItens}\\n*📝 Observações:* \${obs}\`;
                 window.open(\`https://wa.me/\${numeroWhatsApp}?text=\${encodeURIComponent(textoFinal)}\`, '_blank');
             }
