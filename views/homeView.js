@@ -124,6 +124,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     <a href="#catalogo" class="hover:text-brand transition">Catálogo</a>
                     <a href="#sobre" class="hover:text-brand transition">A Fábrica</a>
                     <a href="/vagas" class="text-brand font-bold hover:text-brandDark transition"><i class="fa-solid fa-briefcase mr-1"></i> Vagas</a>
+                    <a href="/admin" class="text-brand font-bold hover:text-brandDark transition"><i class="fa-solid fa-gear mr-1"></i> Admin</a>
                     <a href="#contato" class="bg-brand text-white px-6 py-2.5 rounded-full hover:bg-brandDark hover:shadow-lg hover:shadow-brand/30 transition-all transform hover:-translate-y-0.5">Criar Orçamento</a>
                 </nav>
 
@@ -139,6 +140,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     <a href="#catalogo" class="hover:text-brand" onclick="toggleMobileMenu()">Catálogo</a>
                     <a href="#sobre" class="hover:text-brand" onclick="toggleMobileMenu()">A Fábrica</a>
                     <a href="/vagas" class="text-brand" onclick="toggleMobileMenu()"><i class="fa-solid fa-briefcase mr-1"></i> Vagas</a>
+                    <a href="/admin" class="text-brand font-bold hover:text-brandDark transition"><i class="fa-solid fa-gear mr-1"></i> Admin</a>
                     <a href="#contato" class="bg-brand text-white px-6 py-4 rounded-xl hover:bg-brandDark transition-all mt-2" onclick="toggleMobileMenu()">Criar Orçamento</a>
                 </div>
             </div>
