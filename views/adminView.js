@@ -771,6 +771,44 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 content.classList.add('scale-95');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
+
+            // Controle das Abas (Tabs) do Painel
+            function openTab(tabId, btn) {
+                // Fecha o menu lateral no celular
+                if (window.innerWidth < 1024 && !document.getElementById('adminSidebar').classList.contains('-translate-x-full')) {
+                    toggleAdminMenu();
+                }
+
+                // NOVO: Salva a aba atual na memória do navegador
+                localStorage.setItem('ecoAdminAbaAtiva', tabId);
+
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'border-brand', 'text-brand', 'bg-brandLight', 'border-b-4');
+                    b.classList.add('text-gray-400');
+                });
+                
+                document.getElementById(tabId).classList.add('active');
+                
+                // NOVO: Se o botão não veio no clique (ex: no carregamento da página), o JS procura ele
+                if (!btn) {
+                    btn = document.querySelector(`button[onclick*="${tabId}"]`);
+                }
+                
+                if (btn) {
+                    btn.classList.add('active', 'border-b-4', 'border-brand', 'text-brand', 'bg-brandLight');
+                    btn.classList.remove('text-gray-400');
+                }
+            }
+
+            // NOVO: Assim que a página carrega, ele puxa a aba salva na memória e abre
+            document.addEventListener('DOMContentLoaded', () => {
+                const abaSalva = localStorage.getItem('ecoAdminAbaAtiva');
+                // Se existe uma aba salva e ela existe no HTML, abre ela. Se não, deixa na padrão.
+                if (abaSalva && document.getElementById(abaSalva)) {
+                    openTab(abaSalva);
+                }
+            });
         </script>
     </body>
     </html>
