@@ -17,7 +17,7 @@ module.exports = pool;
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: '1234', 
+    password: '2304', 
     database: 'fabrica_caixas',
     waitForConnections: true,
     connectionLimit: 10,

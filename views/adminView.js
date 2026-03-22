@@ -169,12 +169,19 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
             input[type=file]::file-selector-button:hover { background: #015e15; }
         </style>
     </head>
-    <body class="text-gray-800 flex h-screen overflow-hidden">
+    <body class="text-gray-800 flex h-screen overflow-hidden bg-gray-50">
 
-        <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-2xl z-20">
-            <div class="p-6 border-b border-gray-800 flex items-center">
-                <img src="/logo.png" alt="Logo Ecocaixas" class="h-8 w-auto mr-3">
-                <span class="text-xl font-black tracking-tight">EcoAdmin</span>
+        <div id="mobileOverlay" class="fixed inset-0 bg-gray-900/60 z-30 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleAdminMenu()"></div>
+
+        <aside id="adminSidebar" class="w-64 flex-shrink-0 bg-gray-900 text-white flex flex-col shadow-2xl z-40 absolute inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 lg:relative lg:translate-x-0">
+            <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="/logo.png" alt="Logo Ecocaixas" class="h-8 w-auto mr-3">
+                    <span class="text-xl font-black tracking-tight">EcoAdmin</span>
+                </div>
+                <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleAdminMenu()">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
             </div>
             <nav class="flex-grow p-4 space-y-2 overflow-y-auto">
                 <button onclick="openTab('tab-produtos', this)" class="tab-btn active w-full flex items-center px-4 py-3 rounded-lg text-left font-bold transition-colors hover:bg-gray-800">
@@ -207,13 +214,25 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-8 relative">
-            <header class="mb-8 flex justify-between items-center">
-                <div>
-                    <h2 class="text-3xl font-black text-gray-800">Gestão de Conteúdo</h2>
-                    <p class="text-gray-500">Atualize os dados do site em tempo real.</p>
+        <div class="flex-1 flex flex-col overflow-hidden relative w-full">
+            
+            <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex items-center justify-between lg:hidden z-20">
+                <div class="flex items-center">
+                    <img src="/logo.png" alt="Logo" class="h-8 w-auto mr-2">
+                    <span class="text-lg font-black text-gray-800">EcoAdmin</span>
                 </div>
+                <button class="text-gray-800 focus:outline-none bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center" onclick="toggleAdminMenu()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
             </header>
+
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8 relative w-full">
+                <header class="mb-6 lg:mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-black text-gray-800">Gestão de Conteúdo</h2>
+                        <p class="text-gray-500 text-sm lg:text-base">Atualize os dados do site em tempo real.</p>
+                    </div>
+                </header>
 
             <section id="tab-produtos" class="tab-content active">
                 <div class="grid lg:grid-cols-3 gap-8">
@@ -664,10 +683,33 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 </div>
             </div>
 
-        </main>
-
+            </main>
+        </div>
+        
         <script>
+            // Controle do Menu Lateral no Mobile
+            function toggleAdminMenu() {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('mobileOverlay');
+                
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                }
+            }
+
+            // Controle das Abas (Tabs) do Painel
             function openTab(tabId, btn) {
+                // Fecha o menu lateral no celular após clicar em uma aba
+                if (window.innerWidth < 1024 && !document.getElementById('adminSidebar').classList.contains('-translate-x-full')) {
+                    toggleAdminMenu();
+                }
+
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.tab-btn').forEach(b => {
                     b.classList.remove('active', 'border-brand', 'text-brand', 'bg-brandLight', 'border-b-4');
@@ -678,6 +720,7 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 btn.classList.remove('text-gray-400');
             }
 
+            // Controle de visualização do Formulário de Pop-up
             function togglePopupInput() {
                 const tipo = document.getElementById('popup_tipo').value;
                 const textoCont = document.getElementById('popup_texto_container');
@@ -700,10 +743,8 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
 
             // Controle do Modal de Edição de Vagas
             function abrirModalEditarVaga(v) {
-                // Atualiza o action do form para o ID da vaga clicada
                 document.getElementById('formEditVaga').action = '/admin/vagas/edit/' + v.id;
                 
-                // Preenche os campos
                 document.getElementById('editVaga_titulo').value = v.titulo;
                 document.getElementById('editVaga_salario').value = v.salario;
                 document.getElementById('editVaga_local').value = v.local;
