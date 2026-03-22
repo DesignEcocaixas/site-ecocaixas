@@ -792,7 +792,7 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 
                 // NOVO: Se o botão não veio no clique (ex: no carregamento da página), o JS procura ele
                 if (!btn) {
-                    btn = document.querySelector(`button[onclick*="${tabId}"]`);
+                    btn = document.querySelector(\`button[onclick*="\${tabId}"]\`);
                 }
                 
                 if (btn) {
