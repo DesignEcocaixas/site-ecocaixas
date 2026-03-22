@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.ecocaixasba.com.br/sitemap.xml
+Sitemap: https://ecocaixasba.com.br/sitemap.xml
