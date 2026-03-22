@@ -1,5 +1,21 @@
-module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo = {}, formModelos = [], formMateriais = []) {
+module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo = {}, formModelos = [], formMateriais = [], popups = [], vagas = []) {
     
+    const hoje = new Date().toISOString().slice(0, 10);
+    
+    // Lógica do Pop-up Genérico
+    const popupAtivo = popups.find(p => {
+        const inicio = new Date(p.data_inicio).toISOString().slice(0, 10);
+        const fim = new Date(p.data_fim).toISOString().slice(0, 10);
+        return hoje >= inicio && hoje <= fim;
+    });
+
+    // NOVO: Lógica da Vaga Ativa (Se existir uma vaga na data de hoje, mostra no modal)
+    const vagaAtiva = vagas.find(v => {
+        const inicio = new Date(v.data_inicio).toISOString().slice(0, 10);
+        const fim = new Date(v.data_fim).toISOString().slice(0, 10);
+        return hoje >= inicio && hoje <= fim;
+    });
+
     // 1. Gerador de Notícias
     const noticiasSlides = noticias.map(item => `
         <div class="swiper-slide bg-white p-8 rounded-3xl shadow-lg border border-gray-100 cursor-pointer hover:shadow-xl transition-shadow" onclick="openModal('${item.titulo}', '${item.descricao.replace(/'/g, "\\'")}')">
@@ -97,17 +113,34 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
     <body class="text-gray-800 antialiased selection:bg-brand selection:text-white">
 
         <header class="bg-white/80 backdrop-blur-lg border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center relative z-50 bg-transparent">
                 <div class="flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                <img src="/logo.png" alt="Logo Ecocaixas" class="h-12 w-auto">
-            </div>
+                    <img src="/logo.png" alt="Logo Ecocaixas" class="h-12 w-auto">
+                </div>
+                
                 <nav class="hidden lg:flex space-x-8 font-semibold items-center text-sm text-gray-600">
                     <a href="#produtos" class="hover:text-brand transition">Destaques</a>
                     <a href="#setores" class="hover:text-brand transition">Setores</a>
                     <a href="#catalogo" class="hover:text-brand transition">Catálogo</a>
                     <a href="#sobre" class="hover:text-brand transition">A Fábrica</a>
+                    <a href="/vagas" class="text-brand font-bold hover:text-brandDark transition"><i class="fa-solid fa-briefcase mr-1"></i> Vagas</a>
                     <a href="#contato" class="bg-brand text-white px-6 py-2.5 rounded-full hover:bg-brandDark hover:shadow-lg hover:shadow-brand/30 transition-all transform hover:-translate-y-0.5">Criar Orçamento</a>
                 </nav>
+
+                <button id="mobileMenuBtn" class="lg:hidden text-gray-800 text-2xl focus:outline-none" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="absolute top-full left-0 w-full bg-white shadow-2xl origin-top transform scale-y-0 opacity-0 transition-all duration-300 flex flex-col lg:hidden z-40 border-b border-gray-100">
+                <div class="px-6 py-6 flex flex-col space-y-5 font-bold text-gray-700 text-center">
+                    <a href="#produtos" class="hover:text-brand" onclick="toggleMobileMenu()">Destaques</a>
+                    <a href="#setores" class="hover:text-brand" onclick="toggleMobileMenu()">Setores</a>
+                    <a href="#catalogo" class="hover:text-brand" onclick="toggleMobileMenu()">Catálogo</a>
+                    <a href="#sobre" class="hover:text-brand" onclick="toggleMobileMenu()">A Fábrica</a>
+                    <a href="/vagas" class="text-brand" onclick="toggleMobileMenu()"><i class="fa-solid fa-briefcase mr-1"></i> Vagas</a>
+                    <a href="#contato" class="bg-brand text-white px-6 py-4 rounded-xl hover:bg-brandDark transition-all mt-2" onclick="toggleMobileMenu()">Criar Orçamento</a>
+                </div>
             </div>
         </header>
 
@@ -338,7 +371,89 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
+        <footer class="bg-gray-900 py-6 border-t border-gray-800 mt-auto relative z-10">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
+                
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <span class="text-white font-bold tracking-wider">Ecocaixas</span> &copy; 2026 — Todos os direitos reservados.
+                </div>
+                
+                <div class="flex items-center justify-center md:justify-end space-x-3">
+                    <span class="text-xs">Desenvolvido por <a href="https://www.instagram.com/71dev_/" target="_blank" class="text-white font-bold hover:text-brand transition-colors">71dev</a></span>
+                    
+                    <span class="w-px h-4 bg-gray-700 mx-2"></span> <a href="https://www.instagram.com/71dev_/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-white transition-colors duration-300 text-lg" aria-label="Instagram da 71dev">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://wa.me/5571983174920" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-[#25D366] transition-colors duration-300 text-lg" aria-label="WhatsApp da 71dev">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+
+            </div>
+        </footer>
+
         <a href="https://wa.me/5571987780304" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#1fae53] transition-all z-40 transform hover:scale-110 flex items-center justify-center h-16 w-16"><i class="fa-brands fa-whatsapp text-3xl"></i></a>
+
+       ${popupAtivo ? `
+        <div id="popupInicial" class="fixed inset-0 bg-gray-900/80 backdrop-blur-md z-[100] hidden flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.4s ease;">
+            <div class="bg-white rounded-xl max-w-4xl w-full p-2 relative shadow-2xl transform scale-95 transition-transform duration-500" id="popupContentBody">
+                <button onclick="fecharPopupInicial()" class="absolute top-4 right-4 w-10 h-10 bg-gray-100/90 rounded-full text-gray-800 hover:bg-gray-200 flex items-center justify-center font-bold text-xl z-20 backdrop-blur">&times;</button>
+                
+                ${popupAtivo.tipo_conteudo === 'imagem' 
+                    ? `<img src="${popupAtivo.conteudo}" class="w-full max-h-[85vh] rounded-lg object-contain mx-auto">` 
+                    : `<div class="p-12 md:p-16 text-center">
+                           <i class="fa-solid fa-circle-exclamation text-6xl text-brand mb-6"></i>
+                           <h3 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">${popupAtivo.titulo}</h3>
+                           <p class="text-gray-600 text-xl md:text-2xl leading-relaxed">${popupAtivo.conteudo}</p>
+                       </div>`
+                }
+            </div>
+        </div>
+        ` : ''}
+
+        ${vagaAtiva ? `
+        <div id="modalVagaEmprego" class="fixed inset-0 bg-gray-900/80 backdrop-blur-md z-[110] hidden flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.4s ease;">
+            <div class="bg-white rounded-xl max-w-2xl w-full relative shadow-2xl transform scale-95 transition-transform duration-500 overflow-hidden" id="modalVagaContent">
+                <button onclick="fecharModalVaga()" class="absolute top-4 right-4 w-10 h-10 bg-black/50 text-white rounded-full hover:bg-black/70 flex items-center justify-center font-bold text-xl z-20 backdrop-blur">&times;</button>
+                
+                <div class="w-full h-48 sm:h-56 bg-gray-200">
+                    <img src="${vagaAtiva.imagem_banner}" class="w-full h-full object-cover" alt="Vaga: ${vagaAtiva.titulo}">
+                </div>
+                
+                <div class="p-8">
+                    <h3 class="text-2xl font-black text-gray-900 mb-2">${vagaAtiva.titulo}</h3>
+                    <p class="text-gray-500 text-sm mb-6">Preencha os dados e anexe seu currículo (PDF ou Imagem).</p>
+                    
+                    <form action="/vagas/candidatar" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="vaga_id" value="${vagaAtiva.id}">
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Candidato</label>
+                                <input type="text" name="nome" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required placeholder="Seu nome completo">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contato (WhatsApp)</label>
+                                <input type="text" name="contato" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required placeholder="(71) 90000-0000">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bairro / Cidade</label>
+                            <input type="text" name="bairro" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required placeholder="Ex: Centro, Camaçari">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Anexar Currículo</label>
+                            <input type="file" name="curriculo" accept=".pdf,image/*" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-600 outline-none" required>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-brand text-white font-bold py-3 rounded-lg hover:bg-brandDark transition shadow-lg">Enviar Currículo</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        ` : ''}
 
         <div id="modalCaixa" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center transition-opacity opacity-0" style="transition: opacity 0.3s ease;">
             <div class="bg-white rounded-[2rem] max-w-md w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalCaixaContent">
@@ -552,6 +667,69 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             function closeModal() {
                 const m = document.getElementById('newsModal'), c = document.getElementById('modalContent');
                 m.classList.add('opacity-0'); c.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
+            }
+
+            // ==========================================
+            // LÓGICA DO POP-UP INICIAL AUTOMÁTICO
+            // ==========================================
+            const popupAtivoHTML = document.getElementById('popupInicial');
+            if (popupAtivoHTML) {
+                // Espera 1 segundo e meio após abrir o site para mostrar o Pop-up
+                setTimeout(() => {
+                    popupAtivoHTML.classList.remove('hidden');
+                    // Pequeno delay para a animação do CSS rodar
+                    setTimeout(() => {
+                        popupAtivoHTML.classList.remove('opacity-0');
+                        document.getElementById('popupContentBody').classList.remove('scale-95');
+                    }, 50);
+                }, 1500);
+            }
+
+            function fecharPopupInicial() {
+                if(popupAtivoHTML) {
+                    popupAtivoHTML.classList.add('opacity-0');
+                    document.getElementById('popupContentBody').classList.add('scale-95');
+                    setTimeout(() => popupAtivoHTML.classList.add('hidden'), 400);
+                }
+            }
+
+            // Lógica para abrir o Modal de Vagas automaticamente
+            const modalVagaHTML = document.getElementById('modalVagaEmprego');
+            if (modalVagaHTML) {
+                // Abre o modal de vagas 2 segundos após entrar no site
+                setTimeout(() => {
+                    modalVagaHTML.classList.remove('hidden');
+                    setTimeout(() => {
+                        modalVagaHTML.classList.remove('opacity-0');
+                        document.getElementById('modalVagaContent').classList.remove('scale-95');
+                    }, 50);
+                }, 2000);
+            }
+
+            function fecharModalVaga() {
+                if(modalVagaHTML) {
+                    modalVagaHTML.classList.add('opacity-0');
+                    document.getElementById('modalVagaContent').classList.add('scale-95');
+                    setTimeout(() => modalVagaHTML.classList.add('hidden'), 400);
+                }
+            }
+
+            // Controle do Menu Mobile
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const icon = document.querySelector('#mobileMenuBtn i');
+                
+                // Se estiver fechado (escala 0), ele abre
+                if (menu.classList.contains('scale-y-0')) {
+                    menu.classList.remove('scale-y-0', 'opacity-0');
+                    menu.classList.add('scale-y-100', 'opacity-100');
+                    icon.classList.replace('fa-bars', 'fa-xmark'); // Troca pra ícone de Fechar (X)
+                } else {
+                    // Se estiver aberto, ele fecha
+                    menu.classList.add('scale-y-0', 'opacity-0');
+                    menu.classList.remove('scale-y-100', 'opacity-100');
+                    icon.classList.replace('fa-xmark', 'fa-bars'); // Volta pro ícone Hamburguer
+                }
             }
         </script>
     </body>
