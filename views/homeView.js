@@ -513,7 +513,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
             new Swiper('.productSwiper', {
                 slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true,
-                autoplay: { delay: 3000, disableOnInteraction: false },
+                autoplay: { delay: 4000, disableOnInteraction: false },
                 navigation: { nextEl: '.productSwiper .swiper-button-next', prevEl: '.productSwiper .swiper-button-prev' },
                 pagination: { el: '.productSwiper .swiper-pagination', clickable: true },
                 breakpoints: { 768: { slidesPerView: 2, spaceBetween: 30 }, 1024: { slidesPerView: 3, spaceBetween: 40 } }
@@ -521,7 +521,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
             new Swiper('.swiperAlimentos', {
                 slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 3000, disableOnInteraction: false },
+                autoplay: { delay: 4000, disableOnInteraction: false },
                 navigation: { nextEl: '.alimentos-next', prevEl: '.alimentos-prev' },
                 pagination: { el: '.swiperAlimentos .swiper-pagination', clickable: true },
                 breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
@@ -529,7 +529,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
             new Swiper('.swiperIndustrial', {
                 slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 3000, disableOnInteraction: false, reverseDirection: true },
+                autoplay: { delay: 4000, disableOnInteraction: false, reverseDirection: true },
                 navigation: { nextEl: '.ind-next', prevEl: '.ind-prev' },
                 pagination: { el: '.swiperIndustrial .swiper-pagination', clickable: true },
                 breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
@@ -537,7 +537,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             
             new Swiper('.newsSwiper', { 
                 slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 3000, disableOnInteraction: false }, 
+                autoplay: { delay: 4000, disableOnInteraction: false }, 
                 pagination: { el: '.newsSwiper .swiper-pagination', clickable: true } 
             });
 
@@ -684,7 +684,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         popupAtivoHTML.classList.remove('opacity-0');
                         document.getElementById('popupContentBody').classList.remove('scale-95');
                     }, 50);
-                }, 1500);
+                }, 1000);
             }
 
             function fecharPopupInicial() {
@@ -705,7 +705,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         modalVagaHTML.classList.remove('opacity-0');
                         document.getElementById('modalVagaContent').classList.remove('scale-95');
                     }, 50);
-                }, 2000);
+                }, 1500);
             }
 
             function fecharModalVaga() {
