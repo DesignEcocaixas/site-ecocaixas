@@ -29,7 +29,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
     // 2. Gerador Dinâmico de Cards de Produtos
     const renderCaixaCard = (p) => `
         <div class="swiper-slide bg-white overflow-hidden border border-gray-100 flex flex-col h-full rounded-3xl shadow-sm">
-            <div class="relative h-64 md:h-56 overflow-hidden">
+            <div class="relative h-64 md:h-80 lg:h-96 overflow-hidden">
                 <img src="${p.imagem_url}" class="w-full h-full object-cover transform hover:scale-110 transition duration-700" alt="${p.titulo}">
             </div>
             <div class="p-6 md:p-8 text-center flex-grow flex flex-col justify-center">
