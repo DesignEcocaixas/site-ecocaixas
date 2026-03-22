@@ -69,6 +69,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
         <meta name="description" content="Fábrica de caixas de papelão personalizadas em Camaçari - BA. Embalagens sob medida para os setores alimentício e industrial. Peça seu orçamento direto da fábrica!">
         <meta name="keywords" content="caixas de papelão, papelão, caixas de papelão personalizadas, embalagens personalizadas Bahia, fábrica de caixas Camaçari, caixas para delivery, caixas industriais sob medida, embalagens de papelão personalizadas">
         <meta name="robots" content="index, follow">
+
+        <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png?v=3">
+        <link rel="apple-touch-icon" href="/favicon.png?v=3">
+
         <link rel="canonical" href="https://ecocaixasba.com.br/" />
 
         <title>Ecocaixas | Caixas de papelão personalizadas</title>
