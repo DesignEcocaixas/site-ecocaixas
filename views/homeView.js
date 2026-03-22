@@ -603,12 +603,23 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     selectMaterial.disabled = false;
                     
                     const modelosFiltrados = dbModelos.filter(m => m.secao === setor);
-                    if(modelosFiltrados.length === 0) selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
-                    modelosFiltrados.forEach(mod => { selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}</option>\`; });
+                    if(modelosFiltrados.length === 0) {
+                        selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
+                    }
+                    
+                    // AQUI ESTÁ A MUDANÇA: Adicionando o tamanho ao lado do nome da caixa
+                    modelosFiltrados.forEach(mod => { 
+                        const detalheTamanho = mod.tamanho ? \` - \${mod.tamanho}\` : '';
+                        selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}\${detalheTamanho}</option>\`; 
+                    });
 
                     const materiaisFiltrados = dbMateriais.filter(m => m.secao === setor || m.secao === 'ambos');
-                    if(materiaisFiltrados.length === 0) selectMaterial.innerHTML = '<option value="" disabled>Nenhum material cadastrado.</option>';
-                    materiaisFiltrados.forEach(mat => { selectMaterial.innerHTML += \`<option value="\${mat.nome}">\${mat.nome}</option>\`; });
+                    if(materiaisFiltrados.length === 0) {
+                        selectMaterial.innerHTML = '<option value="" disabled>Nenhum material cadastrado.</option>';
+                    }
+                    materiaisFiltrados.forEach(mat => { 
+                        selectMaterial.innerHTML += \`<option value="\${mat.nome}">\${mat.nome}</option>\`; 
+                    });
                 }
             }
 
