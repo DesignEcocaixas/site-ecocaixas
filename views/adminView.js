@@ -83,7 +83,12 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
     };
 
     const renderProdutosRow = (secaoFiltro, badgeColor, badgeLabel) => {
-        return produtos.filter(p => p.secao === secaoFiltro).map(p => `
+        return produtos.filter(p => p.secao === secaoFiltro).map(p => {
+            
+            // Montando o objeto seguro para o JavaScript ler sem quebrar com aspas ou quebras de linha
+            const pData = `{ id: ${p.id}, secao: '${p.secao}', titulo: '${p.titulo.replace(/'/g, "\\'")}', descricao: '${p.descricao.replace(/\r?\n|\r/g, ' ').replace(/'/g, "\\'")}' }`;
+
+            return `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                 <td class="py-3 px-4 flex items-center">
                     <img src="${p.imagem_url}" class="w-12 h-12 rounded object-cover mr-3 shadow-sm border" alt="${p.titulo}">
@@ -93,13 +98,16 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                     </div>
                 </td>
                 <td class="py-3 px-4"><span class="bg-${badgeColor}-100 text-${badgeColor}-700 px-2 py-1 rounded text-xs font-bold">${badgeLabel}</span></td>
-                <td class="py-3 px-4 text-right">
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <button type="button" onclick="abrirModalEditarProduto(${pData})" class="text-blue-500 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded mr-2 transition"><i class="fa-solid fa-pen"></i></button>
+                    
                     <form action="/admin/produtos/delete/${p.id}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir esta caixa?')">
                         <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition"><i class="fa-solid fa-trash"></i></button>
                     </form>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     };
 
     const renderNoticiasRow = () => {
@@ -683,6 +691,38 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 </div>
             </div>
 
+            <div id="modalEditProduto" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]" id="modalEditProdutoContent">
+                    <button type="button" onclick="fecharModalEditarProduto()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-gray-900 mb-6 border-b pb-2"><i class="fa-solid fa-pen text-blue-500 mr-2"></i> Editar Card da Caixa</h3>
+                    
+                    <form id="formEditProduto" method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Seção do Site</label>
+                            <select id="editProd_secao" name="secao" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none font-medium" required>
+                                <option value="destaque">Destaques da Linha (Topo)</option>
+                                <option value="alimenticio">Linha Alimentícia</option>
+                                <option value="industrial">Linha Industrial</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Título da Caixa</label>
+                            <input type="text" id="editProd_titulo" name="titulo" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descrição</label>
+                            <textarea id="editProd_descricao" name="descricao" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Substituir Imagem (Opcional)</label>
+                            <input type="file" name="imagem" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-500 outline-none">
+                            <p class="text-[10px] text-gray-400 mt-1">Deixe em branco para manter a imagem atual.</p>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition shadow">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
             </main>
         </div>
         
@@ -809,6 +849,33 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                     openTab(abaSalva);
                 }
             });
+
+            // Controle do Modal de Edição de Produtos/Caixas
+            function abrirModalEditarProduto(p) {
+                // Atualiza a rota do formulário com o ID dinâmico
+                document.getElementById('formEditProduto').action = '/admin/produtos/edit/' + p.id;
+                
+                // Preenche os campos do modal
+                document.getElementById('editProd_secao').value = p.secao;
+                document.getElementById('editProd_titulo').value = p.titulo;
+                document.getElementById('editProd_descricao').value = p.descricao;
+
+                const modal = document.getElementById('modalEditProduto');
+                const content = document.getElementById('modalEditProdutoContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { 
+                    modal.classList.remove('opacity-0'); 
+                    content.classList.remove('scale-95'); 
+                }, 10);
+            }
+
+            function fecharModalEditarProduto() {
+                const modal = document.getElementById('modalEditProduto');
+                const content = document.getElementById('modalEditProdutoContent');
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
         </script>
     </body>
     </html>

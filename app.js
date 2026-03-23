@@ -455,6 +455,32 @@ app.post('/admin/popup/delete/:id', async (req, res) => {
     }
 });
 
+// --- Rota para Editar Produto (Caixa) ---
+app.post('/admin/produtos/edit/:id', upload.single('imagem'), async (req, res) => {
+    const { secao, titulo, descricao } = req.body;
+    
+    try {
+        // Se o usuário selecionou uma nova imagem no formulário
+        if (req.file) {
+            const imagem_url = `/uploads/${req.file.filename}`;
+            await db.query(
+                'UPDATE produtos SET secao = ?, titulo = ?, descricao = ?, imagem_url = ? WHERE id = ?',
+                [secao, titulo, descricao, imagem_url, req.params.id]
+            );
+        } else {
+            // Se NÃO enviou imagem, atualiza apenas os textos e mantém a imagem atual intacta
+            await db.query(
+                'UPDATE produtos SET secao = ?, titulo = ?, descricao = ? WHERE id = ?',
+                [secao, titulo, descricao, req.params.id]
+            );
+        }
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao editar produto:', error);
+        res.status(500).send('Erro ao atualizar caixa no banco de dados.');
+    }
+});
+
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
