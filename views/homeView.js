@@ -184,7 +184,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="w-20 h-20 bg-white rounded-2xl border border-gray-300 shadow-sm flex items-center justify-center text-4xl mb-8 text-brand transform group-hover:-translate-y-2 transition-transform duration-300">
                             <i class="fa-solid fa-burger"></i>
                         </div>
-                        <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Alimentício</h3>
+                        <h4 class="text-3xl font-black text-gray-900 mb-4">Setor Alimentício / Delivery</h4>
                         <p class="text-gray-600 mb-8 leading-relaxed">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
                     </div>
 
@@ -192,7 +192,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="w-20 h-20 bg-white rounded-2xl border border-gray-300 shadow-sm flex items-center justify-center text-4xl mb-8 text-gray-800 transform group-hover:-translate-y-2 transition-transform duration-300">
                             <i class="fa-solid fa-industry"></i>
                         </div>
-                        <h3 class="text-3xl font-black text-gray-900 mb-4">Ramo Industrial</h3>
+                        <h4 class="text-3xl font-black text-gray-900 mb-4">Setor Industrial / E-commerce</h4>
                         <p class="text-gray-600 mb-8 leading-relaxed">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
                     </div>
 
@@ -371,6 +371,33 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
                         <textarea class="w-full bg-gray-50 px-5 py-4 rounded-2xl border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 font-medium" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
                     </div>
+
+                        <div class="mt-8 border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand rounded-2xl pt-6 pb-8 mb-6 px-4">
+                                <h4 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fa-solid fa-credit-card text-brand mr-2"></i> Pagamento</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Forma de Pagamento</label>
+                                        <select id="formaPagamento" class="w-full bg-gray-50 px-4 py-3 border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand rounded-2xl focus:ring-2 focus:ring-brand font-medium text-gray-900 outline-none transition-all" required onchange="toggleBandeirasCartao()">
+                                            <option value="" disabled selected>Selecione...</option>
+                                            <option value="À vista (Pix/Transferência)">À vista (Pix/Transferência)</option>
+                                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                            <option value="Cartão de Débito">Cartão de Débito</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="containerBandeira" class="hidden">
+                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Bandeira do Cartão</label>
+                                        <select id="bandeiraCartao" class="w-full bg-gray-50 px-4 py-3 border border-gray-300 ring-1 ring-gray-300 focus:ring-2 focus:ring-brand focus:border-brand rounded-2xl focus:ring-2 focus:ring-brand font-medium text-gray-900 outline-none transition-all">
+                                            <option value="" disabled selected>Selecione a bandeira...</option>
+                                            <option value="Visa">Visa</option>
+                                            <option value="Mastercard">Mastercard</option>
+                                            <option value="Elo">Elo</option>
+                                            <option value="Hipercard">Hipercard</option>
+                                            <option value="American Express">American Express</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
 
                     <button type="submit" class="w-full bg-[#25D366] hover:bg-[#1fae53] text-white font-black py-5 rounded-full transition-all transform hover:-translate-y-1 shadow-xl shadow-green-500/30 text-lg flex justify-center items-center border-2 border-[#1fae53]">
                         <i class="fa-brands fa-whatsapp text-2xl mr-3"></i> Enviar Pedido via WhatsApp
@@ -607,10 +634,9 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
                     }
                     
-                    // AQUI ESTÁ A MUDANÇA: Adicionando o tamanho ao lado do nome da caixa
+                    // Revertido: Agora exibe apenas o nome do modelo (mod.nome)
                     modelosFiltrados.forEach(mod => { 
-                        const detalheTamanho = mod.tamanho ? \` - \${mod.tamanho}\` : '';
-                        selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}\${detalheTamanho}</option>\`; 
+                        selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}</option>\`; 
                     });
 
                     const materiaisFiltrados = dbMateriais.filter(m => m.secao === setor || m.secao === 'ambos');
@@ -642,14 +668,31 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             function removerItem(index) { itensOrcamento.splice(index, 1); renderizarLista(); }
 
             function renderizarLista() {
-                const container = document.getElementById('listaPedidos'); const emptyState = document.getElementById('emptyState');
-                if(itensOrcamento.length === 0) { container.innerHTML = ''; container.appendChild(emptyState); emptyState.style.display = 'block'; return; }
-                emptyState.style.display = 'none'; let html = '';
+                const container = document.getElementById('listaPedidos'); 
+                const emptyState = document.getElementById('emptyState');
+                
+                // 1. Se não tem itens, limpa os cards antigos, mostra o Empty State e para a função
+                if(itensOrcamento.length === 0) { 
+                    container.innerHTML = ''; 
+                    if(emptyState) {
+                        container.appendChild(emptyState); 
+                        emptyState.style.display = 'block'; 
+                    }
+                    return; 
+                }
+                
+                // 2. Oculta o Empty State (se ele existir)
+                if(emptyState) {
+                    emptyState.style.display = 'none'; 
+                }
+                
+                // 3. Monta o HTML com os cards
+                let html = '';
                 itensOrcamento.forEach((item, index) => {
                     html += \`
-                    <div class="bg-white p-5 border border-gray-100 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="bg-white p-5 border border-gray-100 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full \${item.setor.includes('Alimentício') ? 'bg-brandLight text-brand' : 'bg-gray-100 text-gray-800'} flex items-center justify-center text-xl"><i class="fa-solid fa-box"></i></div>
+                            <div class="w-12 h-12 rounded-full \${item.setor.includes('Alimentício') ? 'bg-brandLight text-brand' : 'bg-gray-100 text-gray-800'} flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-box"></i></div>
                             <div>
                                 <p class="font-black text-gray-900 text-lg">\${item.qtd}x \${item.modelo}</p>
                                 <p class="text-sm text-gray-500 font-medium">\${item.tamanho} • \${item.material}</p>
@@ -658,23 +701,47 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <button type="button" onclick="removerItem(\${index})" class="w-full md:w-auto bg-red-50 text-red-500 hover:bg-red-100 px-4 py-2 rounded-full font-bold transition-colors text-sm"><i class="fa-solid fa-trash mr-2"></i> Remover</button>
                     </div>\`;
                 });
-                container.innerHTML = html;
+                
+                // 4. O "Pulo do Gato": Esvazia o container, devolve o empty state (escondido) e INJETA os cards depois dele!
+                container.innerHTML = '';
+                if(emptyState) container.appendChild(emptyState);
+                
+                container.insertAdjacentHTML('beforeend', html);
             }
 
             function prepararEnvio(event) {
                 event.preventDefault();
-                if(itensOrcamento.length === 0) return alert("Adicione pelo menos uma caixa ao carrinho.");
-                const empresa = document.getElementById('empresa').value; const contato = document.getElementById('contatoNome').value;
+                if(itensOrcamento.length === 0) {
+                    alert("Adicione pelo menos uma caixa ao carrinho.");
+                    return;
+                }
+                
+                const empresa = document.getElementById('empresa').value; 
+                const contato = document.getElementById('contatoNome').value;
                 const insta = document.getElementById('checkInsta').checked ? 'Não possui' : (document.getElementById('instagram').value || 'Não informado');
                 const site = document.getElementById('checkSite').checked ? 'Não possui' : (document.getElementById('site').value || 'Não informado');
                 const obs = document.getElementById('descricaoGeral').value || 'Nenhuma observação adicional.';
                 const setorPrincipal = document.getElementById('setorPrincipal').value;
 
+                // Captura dos novos campos de pagamento
+                const formaPagamento = document.getElementById('formaPagamento').value;
+                const bandeiraCartao = document.getElementById('bandeiraCartao').value;
+                
+                let textoPagamento = \`*\uD83D\uDCB3 Pagamento:* \${formaPagamento}\`;
+                if (formaPagamento.includes('Cartão') && bandeiraCartao) {
+                    textoPagamento += \` (\${bandeiraCartao})\`;
+                }
+
                 let textoItens = '';
-                itensOrcamento.forEach((item, i) => { textoItens += \`\\n📦 *Item \${i+1}*:\\n- Modelo: \${item.modelo} (\${item.setor})\\n- Tamanho: \${item.tamanho}\\n- Quantidade: \${item.qtd}\\n- Material: \${item.material}\\n\`; });
+                itensOrcamento.forEach((item, i) => { 
+                    textoItens += \`\\n\uD83D\uDCE6 *Item \${i+1}*:\\n- Modelo: \${item.modelo} (\${item.setor})\\n- Tamanho: \${item.tamanho}\\n- Quantidade: \${item.qtd}\\n- Material: \${item.material}\\n\`; 
+                });
 
                 let numeroWhatsApp = setorPrincipal === 'alimenticio' ? '5571987780304' : '5571999317529';
-                const textoFinal = \`*NOVO ORÇAMENTO - ECOCAIXAS* 🏭\\n--------------------------------\\n*Empresa:* \${empresa}\\n*Contato:* \${contato}\\n*Instagram:* \${insta}\\n*Site/App:* \${site}\\n\\n*🛒 ITENS DO PEDIDO:* \${textoItens}\\n*📝 Observações:* \${obs}\`;
+                
+                // Montagem da mensagem final com variáveis escapadas para não quebrar o Node.js
+                const textoFinal = \`*NOVO ORÇAMENTO - ECOCAIXAS* \uD83C\uDFED\\n--------------------------------\\n*Empresa:* \${empresa}\\n*Contato:* \${contato}\\n*Instagram:* \${insta}\\n*Site/App:* \${site}\\n\\n*\uD83D\uDED2 ITENS DO PEDIDO:* \${textoItens}\\n\${textoPagamento}\\n\\n*\uD83D\uDCDD Observações:* \${obs}\`;
+                
                 window.open(\`https://wa.me/\${numeroWhatsApp}?text=\${encodeURIComponent(textoFinal)}\`, '_blank');
             }
 
@@ -748,6 +815,23 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     menu.classList.add('scale-y-0', 'opacity-0');
                     menu.classList.remove('scale-y-100', 'opacity-100');
                     icon.classList.replace('fa-xmark', 'fa-bars'); // Volta pro ícone Hamburguer
+                }
+            }
+
+            // Controle de exibição das Bandeiras de Cartão
+            function toggleBandeirasCartao() {
+                const forma = document.getElementById('formaPagamento').value;
+                const containerBandeira = document.getElementById('containerBandeira');
+                const bandeiraCartao = document.getElementById('bandeiraCartao');
+                
+                // Se o texto selecionado incluir a palavra "Cartão", mostra as bandeiras
+                if (forma.includes('Cartão')) {
+                    containerBandeira.classList.remove('hidden');
+                    bandeiraCartao.required = true;
+                } else {
+                    containerBandeira.classList.add('hidden');
+                    bandeiraCartao.required = false;
+                    bandeiraCartao.value = ''; // Limpa o valor se a pessoa desistir do cartão
                 }
             }
         </script>
