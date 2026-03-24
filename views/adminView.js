@@ -1,4 +1,4 @@
-module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias = [], stats = {}, formModelos = [], formMateriais = [], popups = [], vagas = [], candidaturas = []) {
+module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias = [], stats = {}, formModelos = [], formMateriais = [], popups = [], vagas = [], candidaturas = [], configs = {}) {
     
     const renderVagasRow = () => {
         if(vagas.length === 0) return `<tr><td colspan="4" class="p-6 text-center text-gray-400">Nenhuma vaga ativa ou programada.</td></tr>`;
@@ -607,6 +607,41 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    
+                    <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
+                        <h3 class="font-bold text-white mb-4 border-b border-gray-700 pb-2 flex items-center"><i class="fa-solid fa-envelope text-brand mr-2"></i> E-mail de Recebimento (RH)</h3>
+                        <form action="/admin/config/email_vagas" method="POST" class="flex flex-col sm:flex-row gap-3">
+                            <input type="email" name="email_vagas" value="${configs.email_vagas || 'designecocaixasba@gmail.com'}" class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 outline-none font-medium text-white placeholder-gray-400 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" required placeholder="rh@ecocaixas.com.br">
+                            <button type="submit" class="bg-brand text-white font-bold py-2 px-6 rounded-lg hover:bg-brandDark transition shadow text-sm whitespace-nowrap">Salvar E-mail</button>
+                        </form>
+                        <p class="text-xs text-gray-400 mt-3">Todos os currículos enviados pelo site (PDF/Imagem) serão encaminhados automaticamente para esta caixa de entrada.</p>
+                    </div>
+
+                    <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
+                        <h3 class="font-bold text-white mb-4 border-b border-gray-700 pb-2 flex items-center"><i class="fa-solid fa-plug text-brand mr-2"></i> Integrações de Vagas</h3>
+                        
+                        <div class="flex items-center justify-between bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                            <div>
+                                <p class="font-bold text-brand text-sm flex items-center">
+                                    Webhook Onstude 
+                                    <span class="${configs.onstude_ativo == 0 ? 'bg-gray-700 text-gray-300' : 'bg-brand/10 text-brand'} text-[10px] px-2 py-0.5 rounded-full ml-2 uppercase tracking-wide">
+                                        ${configs.onstude_ativo == 0 ? 'Pausado' : 'Ativo'}
+                                    </span>
+                                </p>
+                                <p class="text-xs text-gray-200 mt-1">Notifica os alunos do Onstude quando uma nova vaga é criada.</p>
+                            </div>
+                            <form action="/admin/config/toggle_onstude" method="POST" class="m-0">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="onstude_ativo" class="sr-only peer" ${configs.onstude_ativo == 0 ? '' : 'checked'} onchange="this.form.submit()">
+                                    <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                                </label>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
 

@@ -4,9 +4,10 @@ const fs = require('fs');
 const multer = require('multer'); // Biblioteca de upload
 const db = require('./db');
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 
 const renderHome = require('./views/homeView');
-const renderAdmin = require('./views/adminView'); 
+const renderAdmin = require('./views/adminView');
 const renderVagas = require('./views/vagasView');
 const renderLogin = require('./views/loginView');
 
@@ -23,11 +24,11 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadDir); 
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname)); 
+        cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
 
@@ -40,6 +41,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// ==========================================
+// CONFIGURAÇÃO DE E-MAIL (NODEMAILER)
+// ==========================================
+// 2. CRIANDO O TRANSPORTER AQUI
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'ecocaixassetorpessoal@gmail.com',
+        pass: 'hyjs pyas yndb ivxe'
+    }
+});
 
 // ==========================================
 // SISTEMA DE AUTENTICAÇÃO
@@ -56,11 +69,11 @@ const requireAuth = (req, res, next) => {
 };
 
 app.use((req, res, next) => {
-  if (req.headers.host.slice(0, 4) === 'www.') {
-    const newHost = req.headers.host.slice(4);
-    return res.redirect(301, 'https://' + newHost + req.originalUrl);
-  }
-  next();
+    if (req.headers.host.slice(0, 4) === 'www.') {
+        const newHost = req.headers.host.slice(4);
+        return res.redirect(301, 'https://' + newHost + req.originalUrl);
+    }
+    next();
 });
 
 // Tela de Login
@@ -92,7 +105,7 @@ app.get('/logout', (req, res) => {
 // ROTAS DO PAINEL ADMINISTRATIVO
 // ==========================================
 // A MÁGICA ACONTECE AQUI: Qualquer rota que comece com /admin terá que passar pelo "requireAuth" antes!
-app.use('/admin', requireAuth); 
+app.use('/admin', requireAuth);
 
 // ==========================================
 // ROTA PRINCIPAL (SITE PÚBLICO)
@@ -107,18 +120,92 @@ app.get('/', async (req, res) => {
         const [formMateriais] = await db.query('SELECT * FROM form_materiais');
         const [popups] = await db.query('SELECT * FROM notificacoes_popup');
         
-        // NOVO: Buscando as vagas de emprego
+        // Buscando as vagas de emprego
         const [vagas] = await db.query('SELECT * FROM vagas');
 
         const info = empresaInfo[0] || {};
         const st = stats[0] || { anos_historia: 11, caixas_vendidas: 8000000 };
 
-        // NOVO: Adicionado "vagas" no final da função renderHome
+        // Adicionado "vagas" no final da função renderHome
         const html = renderHome(st, noticias, produtos, info, formModelos, formMateriais, popups, vagas);
         res.send(html);
     } catch (error) {
         console.error('Erro ao buscar dados do site:', error);
         res.status(500).send('Erro interno do servidor');
+    }
+});
+
+// --- Tela do Painel ---
+app.get('/admin', async (req, res) => {
+    try {
+        const [produtos] = await db.query('SELECT * FROM produtos ORDER BY id DESC');
+        const [empresaInfo] = await db.query('SELECT * FROM empresa_info LIMIT 1');
+        const [stats] = await db.query('SELECT * FROM empresa_stats LIMIT 1');
+        const [noticias] = await db.query('SELECT * FROM mural_noticias ORDER BY data_publicacao DESC');
+        const [formModelos] = await db.query('SELECT * FROM form_modelos ORDER BY secao, nome');
+        const [formMateriais] = await db.query('SELECT * FROM form_materiais ORDER BY secao, nome');
+        const [popups] = await db.query('SELECT * FROM notificacoes_popup ORDER BY id DESC');
+        const [vagas] = await db.query('SELECT * FROM vagas ORDER BY id DESC');
+
+        const [candidaturas] = await db.query(`
+            SELECT c.*, v.titulo as vaga_titulo 
+            FROM candidaturas c 
+            JOIN vagas v ON c.vaga_id = v.id 
+            ORDER BY c.data_envio DESC
+        `);
+
+        // NOVO: Buscando as configurações (Email e Onstude) no banco
+        const [configsDb] = await db.query('SELECT * FROM configuracoes LIMIT 1');
+
+        const info = empresaInfo[0] || {};
+        const st = stats[0] || { anos_historia: 0, caixas_vendidas: 0 };
+        const configs = configsDb[0] || {}; // Passando a variável de configuração!
+
+        const html = renderAdmin(produtos, info, noticias, st, formModelos, formMateriais, popups, vagas, candidaturas, configs);
+        res.send(html);
+    } catch (error) {
+        console.error('Erro ao carregar o painel admin:', error);
+        res.status(500).send('Erro ao processar o painel administrativo.');
+    }
+});
+
+// ==========================================
+// ROTAS: CONFIGURAÇÕES GERAIS (E-MAIL E INTEGRAÇÕES)
+// ==========================================
+app.post('/admin/config/email_vagas', async (req, res) => {
+    const { email_vagas } = req.body;
+    try {
+        // Verifica se já existe alguma configuração salva
+        const [check] = await db.query('SELECT id FROM configuracoes LIMIT 1');
+        
+        if (check.length > 0) {
+            // Se existir, atualiza a linha
+            await db.query('UPDATE configuracoes SET email_vagas = ? WHERE id = ?', [email_vagas, check[0].id]);
+        } else {
+            // Se a tabela estiver vazia, cria a primeira linha já com o e-mail novo
+            await db.query('INSERT INTO configuracoes (email_vagas, onstude_ativo) VALUES (?, 1)', [email_vagas]);
+        }
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao atualizar e-mail de vagas:', error);
+        res.status(500).send('Erro ao atualizar configuração de e-mail.');
+    }
+});
+
+app.post('/admin/config/toggle_onstude', async (req, res) => {
+    const onstude_ativo = req.body.onstude_ativo === 'on' ? 1 : 0;
+    try {
+        const [check] = await db.query('SELECT id FROM configuracoes LIMIT 1');
+        
+        if (check.length > 0) {
+            await db.query('UPDATE configuracoes SET onstude_ativo = ? WHERE id = ?', [onstude_ativo, check[0].id]);
+        } else {
+            await db.query('INSERT INTO configuracoes (email_vagas, onstude_ativo) VALUES ("designecocaixasba@gmail.com", ?)', [onstude_ativo]);
+        }
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao alternar integração do Onstude:', error);
+        res.status(500).send('Erro ao atualizar integração.');
     }
 });
 
@@ -130,10 +217,10 @@ app.get('/vagas', async (req, res) => {
         // Busca apenas as vagas que estão dentro da data de validade (início <= hoje E fim >= hoje)
         const hoje = new Date().toISOString().slice(0, 10);
         const [vagas] = await db.query(
-            'SELECT * FROM vagas WHERE data_inicio <= ? AND data_fim >= ? ORDER BY id DESC', 
+            'SELECT * FROM vagas WHERE data_inicio <= ? AND data_fim >= ? ORDER BY id DESC',
             [hoje, hoje]
         );
-        
+
         const html = renderVagas(vagas);
         res.send(html);
     } catch (error) {
@@ -158,7 +245,7 @@ app.post('/admin/vagas/toggle/:id', async (req, res) => {
 // --- Rota: Editar Vaga ---
 app.post('/admin/vagas/edit/:id', upload.single('imagem_banner'), async (req, res) => {
     const { titulo, data_inicio, data_fim, disponibilidade, conhecimento, experiencia, local_residencia, salario, beneficios } = req.body;
-    
+
     try {
         // Se enviou uma nova foto, atualiza a foto junto. Se não, atualiza só os textos.
         if (req.file) {
@@ -227,20 +314,64 @@ app.post('/admin/candidaturas/delete/:id', async (req, res) => {
 // ROTAS: VAGAS DE EMPREGO (ADMIN)
 // ==========================================
 app.post('/admin/vagas/add', upload.single('imagem_banner'), async (req, res) => {
-    const { 
-        titulo, data_inicio, data_fim, 
-        disponibilidade, conhecimento, experiencia, 
-        local_residencia, salario, beneficios 
+    const {
+        titulo, data_inicio, data_fim,
+        disponibilidade, conhecimento, experiencia,
+        local_residencia, salario, beneficios
     } = req.body;
-    
+
     const imagem_banner = req.file ? `/uploads/${req.file.filename}` : '';
-    
+
     try {
+        // 1. Salva a vaga no banco de dados da Ecocaixas
         await db.query(
             `INSERT INTO vagas (titulo, imagem_banner, data_inicio, data_fim, disponibilidade, conhecimento, experiencia, local_residencia, salario, beneficios) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [titulo, imagem_banner, data_inicio, data_fim, disponibilidade, conhecimento, experiencia, local_residencia, salario, beneficios]
         );
+
+        // ==========================================
+        // 2. INTEGRAÇÃO ONSTUDE: DISPARO DO WEBHOOK
+        // ==========================================
+        // Checa no banco se a chave da integração está ligada
+        const [configDb] = await db.query('SELECT onstude_ativo FROM configuracoes LIMIT 1');
+        const isOnstudeAtivo = configDb.length > 0 ? configDb[0].onstude_ativo : true;
+
+        if (isOnstudeAtivo) {
+            try {
+                const urlWebhookOnStude = 'http://127.0.0.1:3000/api/webhooks/vagas';
+                const dominioEcocaixas = 'http://127.0.0.1:3054';
+
+                const payload = {
+                    titulo: `Vaga: ${titulo}`,
+                    mensagem: `Nova oportunidade na Ecocaixas! Salário: ${salario || 'A combinar'}. Clique para ver os detalhes.`,
+                    link_url: `${dominioEcocaixas}/vagas`,
+                    imagem_url: imagem_banner ? `${dominioEcocaixas}${imagem_banner}` : null
+                };
+
+                const axios = require('axios');
+
+                // Dispara o webhook em segundo plano (sem await) para não atrasar a tela do Admin
+                axios.post(urlWebhookOnStude, payload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'CHAVE_SECRETA_ONSTUDE_ECOCAIXAS_2024'
+                    }
+                }).then(() => {
+                    console.log('Webhook disparado com sucesso para o OnStude!');
+                }).catch((err) => {
+                    console.error('Falhou ao notificar o OnStude. Motivo:', err.message);
+                });
+
+            } catch (errWebhook) {
+                console.error('Erro na lógica do webhook:', errWebhook.message);
+            }
+        } else {
+            console.log('Aviso: Webhook do Onstude ignorado (Integração pausada no painel).');
+        }
+        // ==========================================
+
+        // Redireciona de volta para a aba de vagas
         res.redirect('/admin');
     } catch (error) {
         console.error('Erro ao adicionar vaga:', error);
@@ -259,49 +390,53 @@ app.post('/admin/vagas/delete/:id', async (req, res) => {
 });
 
 // ==========================================
-// ROTA: RECEBER CURRÍCULO (SITE -> BANCO)
+// ROTA: RECEBER CURRÍCULO (SITE -> BANCO E E-MAIL)
 // ==========================================
 app.post('/vagas/candidatar', upload.single('curriculo'), async (req, res) => {
     const { vaga_id, nome, bairro, contato } = req.body;
-    const curriculo_url = req.file ? `/uploads/${req.file.filename}` : '';
-    
+
+    // Captura o arquivo para enviar por e-mail e salvar no banco
+    const arquivoCurriculo = req.file;
+    const curriculo_url = arquivoCurriculo ? `/uploads/${arquivoCurriculo.filename}` : '';
+
     try {
+        // 1. Salva no banco de dados normalmente
         await db.query('INSERT INTO candidaturas (vaga_id, nome, bairro, contato, curriculo_url) VALUES (?, ?, ?, ?, ?)',
             [vaga_id, nome, bairro, contato, curriculo_url]);
-        
-        // Um alerta simples em JS avisando o candidato que deu certo e voltando pra home
+
+        // 2. Busca o nome da vaga no banco para colocar no título do e-mail
+        const [vagaDb] = await db.query('SELECT titulo FROM vagas WHERE id = ?', [vaga_id]);
+        const tituloDaVaga = vagaDb.length > 0 ? vagaDb[0].titulo : 'Vaga não especificada';
+
+        // Busca o email do RH configurado no painel
+        const [configDb] = await db.query('SELECT email_vagas FROM configuracoes LIMIT 1');
+        const emailRH = configDb.length > 0 ? configDb[0].email_vagas : 'designecocaixasba@gmail.com';
+
+        // Monta o e-mail com os dados e o anexo
+        const mailOptions = {
+            from: 'designecocaixasba@gmail.com',
+            to: emailRH,
+            subject: `Novo Currículo Recebido: ${nome} - ${tituloDaVaga}`,
+            text: `Olá equipe,\n\nUm novo candidato enviou currículo através do site.\n\n📌 DADOS DO CANDIDATO:\n- Nome: ${nome}\n- Vaga Desejada: ${tituloDaVaga}\n- Contato (WhatsApp): ${contato}\n- Localidade: ${bairro}\n\n📄 O arquivo do currículo está em anexo neste e-mail.\n\nAtenciosamente,\nSistema Ecocaixas`,
+            attachments: arquivoCurriculo ? [
+                {
+                    filename: arquivoCurriculo.originalname,
+                    path: arquivoCurriculo.path
+                }
+            ] : []
+        };
+
+        // 4. Dispara o e-mail em segundo plano
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) console.error('Erro ao enviar e-mail de notificação:', error);
+            else console.log('E-mail com currículo enviado com sucesso!');
+        });
+
+        // 5. Retorna a mensagem de sucesso para a tela do candidato
         res.send("<script>alert('Currículo enviado com sucesso! Boa sorte.'); window.location.href='/';</script>");
     } catch (error) {
         console.error('Erro ao enviar currículo:', error);
         res.status(500).send('Erro ao processar candidatura.');
-    }
-});
-
-// ==========================================
-// ROTAS DO PAINEL ADMINISTRATIVO
-// ==========================================
-
-app.get('/admin', async (req, res) => {
-    try {
-        const [produtos] = await db.query('SELECT * FROM produtos ORDER BY id DESC');
-        const [empresaInfo] = await db.query('SELECT * FROM empresa_info LIMIT 1');
-        const [stats] = await db.query('SELECT * FROM empresa_stats LIMIT 1');
-        const [noticias] = await db.query('SELECT * FROM mural_noticias ORDER BY data_publicacao DESC');
-        const [formModelos] = await db.query('SELECT * FROM form_modelos ORDER BY secao, nome');
-        const [formMateriais] = await db.query('SELECT * FROM form_materiais ORDER BY secao, nome');
-        
-        // Nova Consulta: Pop-ups
-        const [popups] = await db.query('SELECT * FROM notificacoes_popup ORDER BY id DESC');
-
-        const info = empresaInfo[0] || {};
-        const st = stats[0] || { anos_historia: 0, caixas_vendidas: 0 };
-
-        // Passando popups para a view
-        const html = renderAdmin(produtos, info, noticias, st, formModelos, formMateriais, popups);
-        res.send(html);
-    } catch (error) {
-        console.error('Erro ao carregar o painel admin:', error);
-        res.status(500).send('Erro ao processar o painel administrativo.');
     }
 });
 
@@ -365,7 +500,7 @@ app.post('/admin/empresa/update', upload.fields([
 // --- Rotas do Mural ---
 app.post('/admin/noticias/add', async (req, res) => {
     const { tipo, titulo, descricao } = req.body;
-    const data_publicacao = new Date().toISOString().slice(0, 10); 
+    const data_publicacao = new Date().toISOString().slice(0, 10);
     try {
         await db.query('INSERT INTO mural_noticias (tipo, titulo, descricao, data_publicacao) VALUES (?, ?, ?, ?)', [tipo, titulo, descricao, data_publicacao]);
         res.redirect('/admin');
@@ -431,12 +566,12 @@ app.post('/admin/form/material/delete/:id', async (req, res) => {
 // --- NOVAS ROTAS: Pop-ups Iniciais ---
 app.post('/admin/popup/add', upload.single('imagem_popup'), async (req, res) => {
     const { titulo, tipo_conteudo, texto_conteudo, data_inicio, data_fim } = req.body;
-    
+
     // Se for imagem, pega o caminho do arquivo enviado. Se for texto, pega o que foi digitado.
     const conteudo = (tipo_conteudo === 'imagem' && req.file) ? `/uploads/${req.file.filename}` : texto_conteudo;
 
     try {
-        await db.query('INSERT INTO notificacoes_popup (titulo, tipo_conteudo, conteudo, data_inicio, data_fim) VALUES (?, ?, ?, ?, ?)', 
+        await db.query('INSERT INTO notificacoes_popup (titulo, tipo_conteudo, conteudo, data_inicio, data_fim) VALUES (?, ?, ?, ?, ?)',
             [titulo, tipo_conteudo, conteudo, data_inicio, data_fim]);
         res.redirect('/admin');
     } catch (error) {
@@ -458,7 +593,7 @@ app.post('/admin/popup/delete/:id', async (req, res) => {
 // --- Rota para Editar Produto (Caixa) ---
 app.post('/admin/produtos/edit/:id', upload.single('imagem'), async (req, res) => {
     const { secao, titulo, descricao } = req.body;
-    
+
     try {
         // Se o usuário selecionou uma nova imagem no formulário
         if (req.file) {
@@ -484,7 +619,7 @@ app.post('/admin/produtos/edit/:id', upload.single('imagem'), async (req, res) =
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
-app.listen(port, '0.0.0.0',() => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`🏭 Servidor da Fábrica rodando em http://localhost:${port}`);
     console.log(`⚙️  Acesso ao Painel: http://localhost:${port}/admin`);
 });
