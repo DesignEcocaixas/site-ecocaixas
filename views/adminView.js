@@ -1,4 +1,4 @@
-module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias = [], stats = {}, formModelos = [], formMateriais = [], popups = [], vagas = [], candidaturas = [], configs = {}) {
+module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias = [], stats = {}, formModelos = [], formMateriais = [], popups = [], vagas = [], candidaturas = [], configs = {}, webhooks = []) {
     
     const renderVagasRow = () => {
         if(vagas.length === 0) return `<tr><td colspan="4" class="p-6 text-center text-gray-400">Nenhuma vaga ativa ou programada.</td></tr>`;
@@ -44,13 +44,18 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
         }).join('');
     };
 
-    // NOVO HELPER: Tabela de Currículos
+    // Helper: Tabela de Currículos (Agora com data-attributes para o filtro)
     const renderCandidaturasRow = () => {
-        if(candidaturas.length === 0) return `<tr><td colspan="5" class="p-6 text-center text-gray-400">Nenhum currículo recebido ainda.</td></tr>`;
+        if(candidaturas.length === 0) return `<tr><td colspan="5" class="p-6 text-center text-gray-400" id="linhaSemCandidatos">Nenhum currículo recebido ainda.</td></tr>`;
         return candidaturas.map(c => {
             const dataEnvio = new Date(c.data_envio).toLocaleDateString('pt-BR');
+            
+            // Limpa aspas para não quebrar o HTML dos atributos data-*
+            const nomeLimpo = c.nome.replace(/"/g, '').toLowerCase();
+            const bairroLimpo = c.bairro.replace(/"/g, '').toLowerCase();
+
             return `
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
+            <tr class="candidato-row border-b border-gray-100 hover:bg-gray-50 transition text-sm" data-nome="${nomeLimpo}" data-vaga="${c.vaga_id}" data-bairro="${bairroLimpo}">
                 <td class="py-3 px-4 font-bold text-gray-800">${c.nome} <br><span class="text-xs text-gray-400 font-normal">Enviado em: ${dataEnvio}</span></td>
                 <td class="py-3 px-4 text-gray-600 font-medium">${c.vaga_titulo}</td>
                 <td class="py-3 px-4 text-gray-600">${c.bairro}</td>
@@ -62,6 +67,47 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                     </form>
                 </td>
             </tr>
+            `;
+        }).join('');
+    };
+
+    const renderWebhooksList = () => {
+        if (webhooks.length === 0) return `<p class="text-gray-400 text-sm p-4 text-center">Nenhuma integração cadastrada.</p>`;
+        return webhooks.map(w => {
+            const wData = `{ id: ${w.id}, nome: '${w.nome.replace(/'/g, "\\'")}', url: '${w.url.replace(/'/g, "\\'")}', api_key: '${(w.api_key || '').replace(/'/g, "\\'")}' }`;
+
+            return `
+            <div class="flex items-center justify-between bg-gray-800/50 p-3 rounded-xl border border-gray-700 mb-2">
+                <div class="flex-1 pr-3 overflow-hidden">
+                    <p class="font-bold text-brand text-sm flex items-center">
+                        ${w.nome} 
+                        <span class="${w.ativo == 0 ? 'bg-gray-700 text-gray-400' : 'bg-brand/10 text-brand'} text-[9px] px-1.5 py-0.5 rounded-full ml-2 uppercase tracking-wide">
+                            ${w.ativo == 0 ? 'Pausado' : 'Ativo'}
+                        </span>
+                    </p>
+                    <p class="text-[11px] text-gray-400 mt-0.5 truncate" title="${w.url}">${w.url}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    
+                    <form action="/admin/webhooks/toggle/${w.id}" method="POST" class="m-0 flex items-center mr-1">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="ativo" class="sr-only peer" ${w.ativo == 0 ? '' : 'checked'} onchange="this.form.submit()">
+                            <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-brand"></div>
+                        </label>
+                    </form>
+                    
+                    <button type="button" onclick="abrirModalEditarWebhook(${wData})" class="text-blue-400 bg-blue-400/10 hover:bg-blue-400/20 transition text-xs w-7 h-7 flex items-center justify-center rounded-md">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <form action="/admin/webhooks/delete/${w.id}" method="POST" class="m-0 flex items-center" onsubmit="return confirm('Tem certeza que deseja excluir esta integração permanentemente?')">
+                        <button type="submit" class="text-red-400 bg-red-400/10 hover:bg-red-400/20 transition text-xs w-7 h-7 flex items-center justify-center rounded-md">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                    
+                </div>
+            </div>
             `;
         }).join('');
     };
@@ -529,87 +575,6 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
 
             <section id="tab-vagas" class="tab-content">
                 
-                <div class="grid lg:grid-cols-3 gap-8 mb-8">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-fit">
-                        <h3 class="text-xl font-bold mb-4 flex items-center border-b pb-2"><i class="fa-solid fa-briefcase text-brand mr-2"></i> Criar Vaga</h3>
-                        <form action="/admin/vagas/add" method="POST" enctype="multipart/form-data">
-                            
-                            <div class="mb-4">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Título da Vaga</label>
-                                <input type="text" name="titulo" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required placeholder="Ex: Operador de Vincadeira">
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Salário</label>
-                                    <input type="text" name="salario" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: R$ 1.609,00 ou A combinar">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Onde Morar</label>
-                                    <input type="text" name="local_residencia" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Camaçari - BA">
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Disponibilidade</label>
-                                <input type="text" name="disponibilidade" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: De 6h30 às 16h30">
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Conhecimento</label>
-                                    <input type="text" name="conhecimento" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Máquina de Corte">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Experiência</label>
-                                    <input type="text" name="experiencia" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Mínimo 6 meses">
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Benefícios</label>
-                                <textarea name="beneficios" rows="2" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Vale Transporte, Alimentação no local..."></textarea>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Início da Captação</label>
-                                    <input type="date" name="data_inicio" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fim da Captação</label>
-                                    <input type="date" name="data_fim" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-6">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Banner da Vaga (Imagem)</label>
-                                <input type="file" name="imagem_banner" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-600 outline-none" required>
-                            </div>
-                            
-                            <button type="submit" class="w-full bg-brand text-white font-bold py-3 rounded-lg hover:bg-brandDark transition shadow">Publicar Vaga</button>
-                        </form>
-                    </div>
-
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden h-fit">
-                        <div class="p-4 border-b bg-gray-50"><h3 class="font-bold text-gray-700">Vagas Anunciadas</h3></div>
-                        <div class="overflow-x-auto max-h-[350px] overflow-y-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="sticky top-0 bg-gray-100 z-10 text-gray-500 text-xs uppercase">
-                                    <tr>
-                                        <th class="py-2 px-4 font-bold">Vaga</th>
-                                        <th class="py-2 px-4 font-bold">Período</th>
-                                        <th class="py-2 px-4 font-bold text-right">Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${renderVagasRow()}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
                     
                     <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
@@ -622,37 +587,68 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                     </div>
 
                     <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
-                        <h3 class="font-bold text-white mb-4 border-b border-gray-700 pb-2 flex items-center"><i class="fa-solid fa-plug text-brand mr-2"></i> Integrações de Vagas</h3>
-                        
-                        <div class="flex items-center justify-between bg-gray-800/50 p-4 rounded-xl border border-gray-700">
-                            <div>
-                                <p class="font-bold text-brand text-sm flex items-center">
-                                    Webhook Onstude 
-                                    <span class="${configs.onstude_ativo == 0 ? 'bg-gray-700 text-gray-300' : 'bg-brand/10 text-brand'} text-[10px] px-2 py-0.5 rounded-full ml-2 uppercase tracking-wide">
-                                        ${configs.onstude_ativo == 0 ? 'Pausado' : 'Ativo'}
-                                    </span>
-                                </p>
-                                <p class="text-xs text-gray-200 mt-1">Notifica os alunos do Onstude quando uma nova vaga é criada.</p>
-                            </div>
-                            <form action="/admin/config/toggle_onstude" method="POST" class="m-0">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="onstude_ativo" class="sr-only peer" ${configs.onstude_ativo == 0 ? '' : 'checked'} onchange="this.form.submit()">
-                                    <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
-                                </label>
-                            </form>
+                        <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                            <h3 class="font-bold text-white flex items-center"><i class="fa-solid fa-plug text-brand mr-2"></i> Integrações</h3>
+                            <button type="button" onclick="abrirModalWebhook()" class="bg-brand/10 hover:bg-brand/20 text-brand font-bold py-1 px-3 rounded-lg transition text-xs flex items-center">
+                                <i class="fa-solid fa-plus mr-1"></i> Nova
+                            </button>
                         </div>
+                        <div class="max-h-64 overflow-y-auto pr-1">
+                            ${renderWebhooksList()}
+                        </div>
+                    </div>
+                </div>
 
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-700"><i class="fa-solid fa-briefcase text-brand mr-2"></i> Vagas Anunciadas</h3>
+                        <button type="button" onclick="abrirModalAddVaga()" class="bg-brand hover:bg-brandDark text-white font-bold py-2 px-4 rounded-lg transition text-sm flex items-center shadow-sm">
+                            <i class="fa-solid fa-plus mr-2"></i> Nova Vaga
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-gray-100 z-10 text-gray-500 text-xs uppercase">
+                                <tr>
+                                    <th class="py-2 px-4 font-bold">Vaga</th>
+                                    <th class="py-2 px-4 font-bold">Período</th>
+                                    <th class="py-2 px-4 font-bold text-center">Status</th>
+                                    <th class="py-2 px-4 font-bold text-right">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${renderVagasRow()}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-700"><i class="fa-solid fa-users text-brand mr-2"></i> Candidatos Recebidos</h3>
-                        <span class="bg-brandLight text-brand text-xs font-bold px-3 py-1 rounded-full">${candidaturas.length} Currículos</span>
+                    
+                    <div class="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex items-center">
+                            <h3 class="font-bold text-gray-700"><i class="fa-solid fa-users text-brand mr-2"></i> Candidatos Recebidos</h3>
+                            <span id="contadorCandidatos" class="bg-brandLight text-brand text-xs font-bold px-3 py-1 rounded-full ml-3">${candidaturas.length} Currículos</span>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full sm:w-56">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="fa-solid fa-search text-gray-400 text-xs"></i>
+                                </div>
+                                <input type="text" id="filtroNomeCandidato" onkeyup="filtrarCandidatos()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full pl-9 p-2 outline-none shadow-sm transition" placeholder="Nome ou bairro...">
+                            </div>
+                            
+                            <select id="filtroVagaCandidato" onchange="filtrarCandidatos()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full sm:w-48 p-2 outline-none shadow-sm transition cursor-pointer">
+                                <option value="todas">Todas as Vagas</option>
+                                ${vagas.map(v => `<option value="${v.id}">${v.titulo}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
+
                     <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
                         <table class="w-full text-left border-collapse min-w-[800px]">
-                            <thead class="sticky top-0 bg-gray-100 z-10 text-gray-500 text-xs uppercase">
+                            <thead class="sticky top-0 bg-gray-100 z-10 text-gray-500 text-xs uppercase shadow-sm">
                                 <tr>
                                     <th class="py-3 px-4 font-bold">Candidato</th>
                                     <th class="py-3 px-4 font-bold">Vaga Desejada</th>
@@ -661,7 +657,7 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                                     <th class="py-3 px-4 font-bold text-right">Currículo</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tabelaCandidatosBody">
                                 ${renderCandidaturasRow()}
                             </tbody>
                         </table>
@@ -754,6 +750,116 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                             <p class="text-[10px] text-gray-400 mt-1">Deixe em branco para manter a imagem atual.</p>
                         </div>
                         <button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition shadow">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="modalAddVaga" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]" id="modalAddVagaContent">
+                    <button type="button" onclick="fecharModalAddVaga()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-gray-900 mb-6 border-b pb-2"><i class="fa-solid fa-plus-circle text-brand mr-2"></i> Criar Nova Vaga</h3>
+                    
+                    <form action="/admin/vagas/add" method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Título da Vaga</label>
+                            <input type="text" name="titulo" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required placeholder="Ex: Operador de Vincadeira">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Salário</label>
+                                <input type="text" name="salario" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: R$ 1.609,00 ou A combinar">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Onde Morar</label>
+                                <input type="text" name="local_residencia" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Camaçari - BA">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Disponibilidade</label>
+                            <input type="text" name="disponibilidade" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: De 6h30 às 16h30">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Conhecimento</label>
+                                <input type="text" name="conhecimento" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Máquina de Corte">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Experiência</label>
+                                <input type="text" name="experiencia" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Mínimo 6 meses">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Benefícios</label>
+                            <textarea name="beneficios" rows="2" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required placeholder="Ex: Vale Transporte, Alimentação no local..."></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Início da Captação</label>
+                                <input type="date" name="data_inicio" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fim da Captação</label>
+                                <input type="date" name="data_fim" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none text-sm" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Banner da Vaga (Imagem)</label>
+                            <input type="file" name="imagem_banner" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm text-gray-600 outline-none" required>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-brand text-white font-bold py-3 rounded-lg hover:bg-brandDark transition shadow">Publicar Vaga</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="modalAddWebhook" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-gray-900 rounded-2xl max-w-md w-full p-6 md:p-8 relative shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="modalAddWebhookContent">
+                    <button type="button" onclick="fecharModalWebhook()" class="absolute top-5 right-5 w-10 h-10 bg-gray-800 rounded-full text-gray-400 hover:bg-gray-700 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-white mb-6 border-b border-gray-700 pb-2"><i class="fa-solid fa-plug text-brand mr-2"></i> Nova Integração</h3>
+                    
+                    <form action="/admin/webhooks/add" method="POST">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nome do Sistema</label>
+                            <input type="text" name="nome" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand" required placeholder="Ex: Onstude">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">URL do Webhook (Endpoint)</label>
+                            <input type="url" name="url" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand" required placeholder="https://api.exemplo.com/webhook">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">x-api-key (Opcional)</label>
+                            <input type="text" name="api_key" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand" placeholder="Chave secreta de autenticação">
+                        </div>
+                        <button type="submit" class="w-full bg-brand text-white font-bold py-3 rounded-lg hover:bg-brandDark transition shadow">Salvar Integração</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="modalEditWebhook" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-gray-900 rounded-2xl max-w-md w-full p-6 md:p-8 relative shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="modalEditWebhookContent">
+                    <button type="button" onclick="fecharModalEditarWebhook()" class="absolute top-5 right-5 w-10 h-10 bg-gray-800 rounded-full text-gray-400 hover:bg-gray-700 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-white mb-6 border-b border-gray-700 pb-2"><i class="fa-solid fa-pen text-blue-500 mr-2"></i> Editar Integração</h3>
+                    
+                    <form id="formEditWebhook" method="POST">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nome do Sistema</label>
+                            <input type="text" id="editWebhook_nome" name="nome" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">URL do Webhook (Endpoint)</label>
+                            <input type="url" id="editWebhook_url" name="url" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">x-api-key (Opcional)</label>
+                            <input type="text" id="editWebhook_apikey" name="api_key" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 outline-none text-white focus:border-brand">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow">Salvar Alterações</button>
                     </form>
                 </div>
             </div>
@@ -909,6 +1015,95 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 const content = document.getElementById('modalEditProdutoContent');
                 modal.classList.add('opacity-0');
                 content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // Controle do Modal de Webhooks
+            function abrirModalWebhook() {
+                const modal = document.getElementById('modalAddWebhook');
+                const content = document.getElementById('modalAddWebhookContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalWebhook() {
+                const modal = document.getElementById('modalAddWebhook');
+                const content = document.getElementById('modalAddWebhookContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // Controle do Modal de Edição de Webhooks
+            function abrirModalEditarWebhook(w) {
+                document.getElementById('formEditWebhook').action = '/admin/webhooks/edit/' + w.id;
+                document.getElementById('editWebhook_nome').value = w.nome;
+                document.getElementById('editWebhook_url').value = w.url;
+                document.getElementById('editWebhook_apikey').value = w.api_key;
+
+                const modal = document.getElementById('modalEditWebhook');
+                const content = document.getElementById('modalEditWebhookContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalEditarWebhook() {
+                const modal = document.getElementById('modalEditWebhook');
+                const content = document.getElementById('modalEditWebhookContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // Controle dos Filtros da Tabela de Candidatos
+            function filtrarCandidatos() {
+                const inputTexto = document.getElementById('filtroNomeCandidato').value.toLowerCase();
+                const inputVaga = document.getElementById('filtroVagaCandidato').value;
+                const linhas = document.querySelectorAll('.candidato-row');
+                const contador = document.getElementById('contadorCandidatos');
+                
+                let visiveis = 0;
+
+                linhas.forEach(linha => {
+                    const nome = linha.getAttribute('data-nome');
+                    const bairro = linha.getAttribute('data-bairro');
+                    const vagaId = linha.getAttribute('data-vaga');
+
+                    // Verifica se o texto digitado bate com o nome ou o bairro
+                    const matchTexto = nome.includes(inputTexto) || bairro.includes(inputTexto);
+                    // Verifica se a vaga selecionada é "todas" ou se bate com a vaga da linha
+                    const matchVaga = (inputVaga === 'todas') || (vagaId === inputVaga);
+
+                    if (matchTexto && matchVaga) {
+                        linha.style.display = ''; // Mostra a linha
+                        visiveis++;
+                    } else {
+                        linha.style.display = 'none'; // Esconde a linha
+                    }
+                });
+
+                // Atualiza o contador de currículos em tempo real
+                contador.innerText = visiveis + (visiveis === 1 ? ' Currículo' : ' Currículos');
+                
+                // Animação leve no contador para indicar a mudança
+                contador.classList.remove('bg-brandLight', 'text-brand');
+                contador.classList.add('bg-gray-200', 'text-gray-600');
+                setTimeout(() => {
+                    contador.classList.remove('bg-gray-200', 'text-gray-600');
+                    contador.classList.add('bg-brandLight', 'text-brand');
+                }, 150);
+            }
+
+            // Controle do Modal de Adicionar Vagas
+            function abrirModalAddVaga() {
+                const modal = document.getElementById('modalAddVaga');
+                const content = document.getElementById('modalAddVagaContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalAddVaga() {
+                const modal = document.getElementById('modalAddVaga');
+                const content = document.getElementById('modalAddVagaContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
         </script>

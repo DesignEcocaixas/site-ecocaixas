@@ -154,14 +154,18 @@ app.get('/admin', async (req, res) => {
             ORDER BY c.data_envio DESC
         `);
 
-        // NOVO: Buscando as configurações (Email e Onstude) no banco
+        // Busca as configurações (E-mail RH e etc)
         const [configsDb] = await db.query('SELECT * FROM configuracoes LIMIT 1');
+        
+        // Busca a nova tabela de Webhooks (Integrações)
+        const [webhooks] = await db.query('SELECT * FROM webhooks ORDER BY id DESC');
 
         const info = empresaInfo[0] || {};
         const st = stats[0] || { anos_historia: 0, caixas_vendidas: 0 };
-        const configs = configsDb[0] || {}; // Passando a variável de configuração!
+        const configs = configsDb[0] || {}; 
 
-        const html = renderAdmin(produtos, info, noticias, st, formModelos, formMateriais, popups, vagas, candidaturas, configs);
+        // Envia todos os dados certinhos para a tela (incluindo o novo webhooks)
+        const html = renderAdmin(produtos, info, noticias, st, formModelos, formMateriais, popups, vagas, candidaturas, configs, webhooks);
         res.send(html);
     } catch (error) {
         console.error('Erro ao carregar o painel admin:', error);
@@ -331,43 +335,38 @@ app.post('/admin/vagas/add', upload.single('imagem_banner'), async (req, res) =>
         );
 
         // ==========================================
-        // 2. INTEGRAÇÃO ONSTUDE: DISPARO DO WEBHOOK
+        // 2. DISPARO DINÂMICO DE WEBHOOKS
         // ==========================================
-        // Checa no banco se a chave da integração está ligada
-        const [configDb] = await db.query('SELECT onstude_ativo FROM configuracoes LIMIT 1');
-        const isOnstudeAtivo = configDb.length > 0 ? configDb[0].onstude_ativo : true;
+        const [activeWebhooks] = await db.query('SELECT * FROM webhooks WHERE ativo = 1');
+        
+        if (activeWebhooks.length > 0) {
+            // URL base da Ecocaixas (ajuste para https://ecocaixasba.com.br quando for para produção)
+            const dominioEcocaixas = 'http://127.0.0.1:3054'; 
+            
+            const payload = {
+                titulo: `Vaga: ${titulo}`,
+                mensagem: `Nova oportunidade na Ecocaixas! Salário: ${salario || 'A combinar'}. Clique para ver os detalhes.`,
+                link_url: `${dominioEcocaixas}/vagas`,
+                imagem_url: imagem_banner ? `${dominioEcocaixas}${imagem_banner}` : null
+            };
 
-        if (isOnstudeAtivo) {
-            try {
-                const urlWebhookOnStude = 'http://127.0.0.1:3000/api/webhooks/vagas';
-                const dominioEcocaixas = 'http://127.0.0.1:3054';
-
-                const payload = {
-                    titulo: `Vaga: ${titulo}`,
-                    mensagem: `Nova oportunidade na Ecocaixas! Salário: ${salario || 'A combinar'}. Clique para ver os detalhes.`,
-                    link_url: `${dominioEcocaixas}/vagas`,
-                    imagem_url: imagem_banner ? `${dominioEcocaixas}${imagem_banner}` : null
-                };
-
-                const axios = require('axios');
-
-                // Dispara o webhook em segundo plano (sem await) para não atrasar a tela do Admin
-                axios.post(urlWebhookOnStude, payload, {
+            const axios = require('axios');
+            
+            // Faz um loop e dispara para TODOS os webhooks que estiverem ativos!
+            activeWebhooks.forEach(hook => {
+                axios.post(hook.url, payload, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': 'CHAVE_SECRETA_ONSTUDE_ECOCAIXAS_2024'
+                        'x-api-key': hook.api_key || '' // Se não tiver chave, envia vazio
                     }
                 }).then(() => {
-                    console.log('Webhook disparado com sucesso para o OnStude!');
-                }).catch((err) => {
-                    console.error('Falhou ao notificar o OnStude. Motivo:', err.message);
+                    console.log(`[Webhook] Disparado com sucesso para: ${hook.nome}`);
+                }).catch(err => {
+                    console.error(`[Webhook] Falha ao notificar ${hook.nome}:`, err.message);
                 });
-
-            } catch (errWebhook) {
-                console.error('Erro na lógica do webhook:', errWebhook.message);
-            }
+            });
         } else {
-            console.log('Aviso: Webhook do Onstude ignorado (Integração pausada no painel).');
+            console.log('Aviso: Nenhum webhook ativo para ser notificado.');
         }
         // ==========================================
 
@@ -617,9 +616,55 @@ app.post('/admin/produtos/edit/:id', upload.single('imagem'), async (req, res) =
 });
 
 // ==========================================
+// ROTAS: CRUD DE WEBHOOKS (INTEGRAÇÕES)
+// ==========================================
+app.post('/admin/webhooks/add', async (req, res) => {
+    const { nome, url, api_key } = req.body;
+    try {
+        await db.query('INSERT INTO webhooks (nome, url, api_key, ativo) VALUES (?, ?, ?, 1)', [nome, url, api_key]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao adicionar webhook:', error);
+        res.status(500).send('Erro ao salvar integração.');
+    }
+});
+
+app.post('/admin/webhooks/toggle/:id', async (req, res) => {
+    const ativo = req.body.ativo === 'on' ? 1 : 0;
+    try {
+        await db.query('UPDATE webhooks SET ativo = ? WHERE id = ?', [ativo, req.params.id]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao alternar webhook:', error);
+        res.status(500).send('Erro ao atualizar status.');
+    }
+});
+
+app.post('/admin/webhooks/delete/:id', async (req, res) => {
+    try {
+        await db.query('DELETE FROM webhooks WHERE id = ?', [req.params.id]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao deletar webhook:', error);
+        res.status(500).send('Erro ao excluir integração.');
+    }
+});
+
+app.post('/admin/webhooks/edit/:id', async (req, res) => {
+    const { nome, url, api_key } = req.body;
+    try {
+        await db.query('UPDATE webhooks SET nome = ?, url = ?, api_key = ? WHERE id = ?', [nome, url, api_key, req.params.id]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao editar webhook:', error);
+        res.status(500).send('Erro ao atualizar integração.');
+    }
+});
+
+// ==========================================
 // INICIALIZAÇÃO
 // ==========================================
 app.listen(port, '0.0.0.0', () => {
-    console.log(`🏭 Servidor da Fábrica rodando em http://localhost:${port}`);
-    console.log(`⚙️  Acesso ao Painel: http://localhost:${port}/admin`);
+    console.log(`Servidor da Fábrica rodando em http://localhost:${port}`);
+    console.log(`Acesso ao Painel: http://localhost:${port}/admin`);
 });
