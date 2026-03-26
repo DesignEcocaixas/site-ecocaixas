@@ -578,17 +578,37 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
                     
                     <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
-                        <h3 class="font-bold text-white mb-4 border-b border-gray-700 pb-2 flex items-center"><i class="fa-solid fa-envelope text-brand mr-2"></i> E-mail de Recebimento (RH)</h3>
-                        <form action="/admin/config/email_vagas" method="POST" class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                            <h3 class="font-bold text-white flex items-center">
+                                <i class="fa-solid fa-envelope text-brand mr-2"></i> E-mail de Recebimento
+                                
+                                <div class="relative group cursor-help ml-2 flex items-center">
+                                    <i class="fa-solid fa-circle-info text-gray-500 hover:text-brand transition text-sm"></i>
+                                    <div class="absolute left-0 sm:-left-4 top-6 w-64 p-3 bg-gray-800 text-xs text-gray-200 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-600 pointer-events-none font-normal leading-relaxed">
+                                        Todos os currículos recebidos pelo site (PDF ou Imagem) serão encaminhados automaticamente com os dados do candidato para esta caixa de entrada.
+                                    </div>
+                                </div>
+                            </h3>
+                        </div>
+                        
+                        <form action="/admin/config/email_vagas" method="POST" class="flex flex-col sm:flex-row gap-3 mt-2">
                             <input type="email" name="email_vagas" value="${configs.email_vagas || 'designecocaixasba@gmail.com'}" class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 outline-none font-medium text-white placeholder-gray-400 text-sm focus:ring-2 focus:ring-brand focus:border-brand transition-all" required placeholder="rh@ecocaixas.com.br">
                             <button type="submit" class="bg-brand text-white font-bold py-2 px-6 rounded-lg hover:bg-brandDark transition shadow text-sm whitespace-nowrap">Salvar E-mail</button>
                         </form>
-                        <p class="text-xs text-gray-400 mt-3">Todos os currículos enviados pelo site (PDF/Imagem) serão encaminhados automaticamente para esta caixa de entrada.</p>
                     </div>
 
                     <div class="bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-700 h-fit">
                         <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="font-bold text-white flex items-center"><i class="fa-solid fa-plug text-brand mr-2"></i> Integrações</h3>
+                            <h3 class="font-bold text-white flex items-center">
+                                <i class="fa-solid fa-plug text-brand mr-2"></i> Integrações
+                                
+                                <div class="relative group cursor-help ml-2 flex items-center">
+                                    <i class="fa-solid fa-circle-info text-gray-500 hover:text-brand transition text-sm"></i>
+                                    <div class="absolute left-0 sm:-left-4 top-6 w-64 p-3 bg-gray-800 text-xs text-gray-200 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-600 pointer-events-none font-normal leading-relaxed">
+                                        Os Webhooks conectam o site da Ecocaixas a outros sistemas. Ao adicionar uma nova vaga, ela será enviada instantaneamente para todos os endpoints ativos (Ex: Onstude).
+                                    </div>
+                                </div>
+                            </h3>
                             <button type="button" onclick="abrirModalWebhook()" class="bg-brand/10 hover:bg-brand/20 text-brand font-bold py-1 px-3 rounded-lg transition text-xs flex items-center">
                                 <i class="fa-solid fa-plus mr-1"></i> Nova
                             </button>
