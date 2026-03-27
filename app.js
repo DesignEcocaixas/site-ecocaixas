@@ -531,6 +531,30 @@ app.post('/admin/form/modelo/add', async (req, res) => {
     }
 });
 
+// --- Rota: Editar Modelo do Form ---
+app.post('/admin/form/modelo/edit/:id', async (req, res) => {
+    const { secao, nome, tamanho } = req.body;
+    try {
+        await db.query('UPDATE form_modelos SET secao = ?, nome = ?, tamanho = ? WHERE id = ?', [secao, nome, tamanho, req.params.id]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao editar modelo do form:', error);
+        res.status(500).send('Erro ao atualizar modelo.');
+    }
+});
+
+// --- Rota: Editar Material do Form ---
+app.post('/admin/form/material/edit/:id', async (req, res) => {
+    const { secao, nome } = req.body;
+    try {
+        await db.query('UPDATE form_materiais SET secao = ?, nome = ? WHERE id = ?', [secao, nome, req.params.id]);
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Erro ao editar material do form:', error);
+        res.status(500).send('Erro ao atualizar material.');
+    }
+});
+
 app.post('/admin/form/modelo/delete/:id', async (req, res) => {
     try {
         await db.query('DELETE FROM form_modelos WHERE id = ?', [req.params.id]);

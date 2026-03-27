@@ -115,17 +115,24 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
     
     const renderRow = (arr, type, deleteRoute) => {
         if(arr.length === 0) return `<tr><td colspan="3" class="p-6 text-center text-gray-400">Nenhum item cadastrado.</td></tr>`;
-        return arr.map(item => `
+        return arr.map(item => {
+            // Empacota os dados de forma segura para o Javascript ler
+            const itemData = `{ id: ${item.id}, secao: '${item.secao}', nome: '${item.nome.replace(/'/g, "\\'")}', tamanho: '${(item.tamanho || '').replace(/'/g, "\\'")}' }`;
+            const editFunction = type === 'modelo' ? `abrirModalEditarModelo(${itemData})` : `abrirModalEditarMaterial(${itemData})`;
+
+            return `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
                 <td class="py-3 px-4 font-bold text-gray-800">${item.nome} ${item.tamanho ? `<span class="block text-xs text-gray-500 font-normal">Tam: ${item.tamanho}</span>` : ''}</td>
                 <td class="py-3 px-4"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold uppercase">${item.secao}</span></td>
-                <td class="py-3 px-4 text-right">
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <button type="button" onclick="${editFunction}" class="text-blue-500 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded mr-2 transition"><i class="fa-solid fa-pen"></i></button>
                     <form action="${deleteRoute}/${item.id}" method="POST" class="inline" onsubmit="return confirm('Excluir este item?')">
-                        <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 px-3 py-1 rounded"><i class="fa-solid fa-trash"></i></button>
+                        <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 px-3 py-1 rounded transition"><i class="fa-solid fa-trash"></i></button>
                     </form>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     };
 
     const renderProdutosRow = (secaoFiltro, badgeColor, badgeLabel) => {
@@ -884,6 +891,57 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
                 </div>
             </div>
 
+            <div id="modalEditModelo" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalEditModeloContent">
+                    <button type="button" onclick="fecharModalEditarModelo()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-gray-900 mb-6 border-b pb-2"><i class="fa-solid fa-pen text-blue-500 mr-2"></i> Editar Modelo</h3>
+                    
+                    <form id="formEditModelo" method="POST">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Setor</label>
+                                <select id="editModelo_secao" name="secao" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none">
+                                    <option value="alimenticio">Alimentício</option>
+                                    <option value="industrial">Industrial</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome do Modelo</label>
+                                <input type="text" id="editModelo_nome" name="nome" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tamanho Automático</label>
+                            <input type="text" id="editModelo_tamanho" name="tamanho" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition shadow">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="modalEditMaterial" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.3s ease;">
+                <div class="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalEditMaterialContent">
+                    <button type="button" onclick="fecharModalEditarMaterial()" class="absolute top-5 right-5 w-10 h-10 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 flex items-center justify-center font-bold text-xl">&times;</button>
+                    <h3 class="text-2xl font-black text-gray-900 mb-6 border-b pb-2"><i class="fa-solid fa-pen text-blue-500 mr-2"></i> Editar Material</h3>
+                    
+                    <form id="formEditMaterial" method="POST">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Disponível para Setor</label>
+                            <select id="editMaterial_secao" name="secao" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none">
+                                <option value="ambos">Ambos (Alimentício e Industrial)</option>
+                                <option value="alimenticio">Apenas Alimentício</option>
+                                <option value="industrial">Apenas Industrial</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome do Material</label>
+                            <input type="text" id="editMaterial_nome" name="nome" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 outline-none" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition shadow">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
             </main>
         </div>
         
@@ -1123,6 +1181,45 @@ module.exports = function renderAdmin(produtos = [], empresaInfo = {}, noticias 
             function fecharModalAddVaga() {
                 const modal = document.getElementById('modalAddVaga');
                 const content = document.getElementById('modalAddVagaContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // Controle do Modal Editar Modelo
+            function abrirModalEditarModelo(item) {
+                document.getElementById('formEditModelo').action = '/admin/form/modelo/edit/' + item.id;
+                document.getElementById('editModelo_secao').value = item.secao;
+                document.getElementById('editModelo_nome').value = item.nome;
+                document.getElementById('editModelo_tamanho').value = item.tamanho;
+                
+                const modal = document.getElementById('modalEditModelo');
+                const content = document.getElementById('modalEditModeloContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalEditarModelo() {
+                const modal = document.getElementById('modalEditModelo');
+                const content = document.getElementById('modalEditModeloContent');
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            // Controle do Modal Editar Material
+            function abrirModalEditarMaterial(item) {
+                document.getElementById('formEditMaterial').action = '/admin/form/material/edit/' + item.id;
+                document.getElementById('editMaterial_secao').value = item.secao;
+                document.getElementById('editMaterial_nome').value = item.nome;
+                
+                const modal = document.getElementById('modalEditMaterial');
+                const content = document.getElementById('modalEditMaterialContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            }
+
+            function fecharModalEditarMaterial() {
+                const modal = document.getElementById('modalEditMaterial');
+                const content = document.getElementById('modalEditMaterialContent');
                 modal.classList.add('opacity-0'); content.classList.add('scale-95');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
