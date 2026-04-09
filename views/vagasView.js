@@ -26,13 +26,13 @@ module.exports = function renderVagas(vagas = []) {
                 : `<button disabled class="mt-auto w-full bg-gray-200 text-gray-400 font-black py-3 md:py-4 text-sm md:text-base rounded-xl cursor-not-allowed border border-gray-300">Seleção Encerrada</button>`;
 
             return `
-            <div class="bg-white rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-gray-200 overflow-hidden ${isDisponivel ? 'hover:border-brand/50 hover:shadow-xl' : 'opacity-80'} transition-all duration-300 flex flex-col relative group">
+            <div class="bg-white rounded-lg md:rounded-xl shadow-sm border-2 border-gray-200 overflow-hidden ${isDisponivel ? 'hover:border-brand/50 hover:shadow-xl' : 'opacity-80'} transition-all duration-300 flex flex-col relative group">
                 ${badgeHTML}
                 <div class="h-32 md:h-48 relative overflow-hidden bg-gray-100 border-b border-gray-200">
                     <img src="${v.imagem_banner}" class="w-full h-full object-cover transform ${isDisponivel ? 'group-hover:scale-105' : 'grayscale'} transition duration-500" alt="${v.titulo}">
                 </div>
                 
-                <div class="p-5 md:p-8 flex flex-col flex-grow">
+                <div class="p-5 md:p-6 flex flex-col flex-grow">
                     <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-4 md:mb-6">${v.titulo}</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm text-gray-600 mb-5 md:mb-6 flex-grow">
@@ -43,7 +43,7 @@ module.exports = function renderVagas(vagas = []) {
                         <div class="col-span-full flex items-start"><i class="fa-solid fa-graduation-cap text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Conhecimentos</strong> ${v.conhecimento}</div></div>
                     </div>
 
-                    <div class="bg-brandLight/30 p-3 md:p-4 rounded-xl mb-5 md:mb-8 border border-brand/10">
+                    <div class="bg-brandLight/30 p-3 md:p-4 rounded-lg mb-5 md:mb-8 border border-brand/10">
                         <strong class="text-brand flex items-center mb-1 text-xs md:text-sm"><i class="fa-solid fa-gift mr-2"></i> Benefícios</strong>
                         <p class="text-xs md:text-sm text-gray-700 leading-relaxed">${v.beneficios}</p>
                     </div>
