@@ -106,7 +106,7 @@ module.exports = function renderVagas(vagas = []) {
         </header>
 
         <section class="pt-16 pb-12 bg-darkBg text-white text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80')] bg-cover bg-center"></div>
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('/fabrica.png')] bg-cover bg-center"></div>
             <div class="container mx-auto px-6 relative z-10">
                 <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Oportunidades</span>
                 <h1 class="text-4xl md:text-5xl font-black mb-4">Trabalhe na Ecocaixas</h1>
