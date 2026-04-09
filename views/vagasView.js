@@ -110,7 +110,7 @@ module.exports = function renderVagas(vagas = []) {
             <div class="container mx-auto px-6 relative z-10">
                 <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Oportunidades</span>
                 <h1 class="text-4xl md:text-5xl font-black mb-4">Trabalhe na Ecocaixas</h1>
-                <p class="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto">Faça parte do time que impulsiona a indústria baiana. Confira nossas vagas abertas e envie seu currículo.</p>
+                <p class="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto">Faça parte do nosso time. Confira as vagas abertas e envie seu currículo.</p>
             </div>
         </section>
 
