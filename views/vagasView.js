@@ -20,6 +20,13 @@ module.exports = function renderVagas(vagas = []) {
                 ? `<span class="absolute top-3 right-3 md:top-4 md:right-4 bg-[#25D366] text-white text-[10px] md:text-xs font-black px-2 py-1 md:px-3 md:py-1.5 rounded-full uppercase tracking-wider shadow-lg z-10 flex items-center"><i class="fa-solid fa-circle-check mr-1 md:mr-2"></i> Aberta</span>`
                 : `<span class="absolute top-3 right-3 md:top-4 md:right-4 bg-red-500 text-white text-[10px] md:text-xs font-black px-2 py-1 md:px-3 md:py-1.5 rounded-full uppercase tracking-wider shadow-lg z-10 flex items-center"><i class="fa-solid fa-lock mr-1 md:mr-2"></i> Encerrada</span>`;
                 
+            // NOVO: Botão de Compartilhamento Nativo MAIOR
+            const shareButtonHTML = `
+                <button onclick="compartilharVaga('${v.titulo.replace(/'/g, "\\'")}', '${v.salario.replace(/'/g, "\\'")}')" class="absolute top-3 left-3 md:top-4 md:left-4 bg-white/90 backdrop-blur text-gray-700 hover:text-brand w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg z-10 flex items-center justify-center transition-all hover:scale-110 border border-gray-100" title="Compartilhar Vaga" aria-label="Compartilhar Vaga">
+                    <i class="fa-solid fa-share-nodes text-xl md:text-2xl"></i>
+                </button>
+            `;
+
             // Botão Interativo responsivo
             const buttonHTML = isDisponivel
                 ? `<button onclick="abrirModalVaga(${v.id}, '${v.titulo}')" class="mt-auto w-full bg-gray-900 text-white font-black py-3 md:py-4 text-sm md:text-base rounded-xl hover:bg-brand transition-colors shadow-lg">Participar da Seleção</button>`
@@ -28,6 +35,7 @@ module.exports = function renderVagas(vagas = []) {
             return `
             <div class="bg-white rounded-lg md:rounded-xl shadow-sm border-2 border-gray-200 overflow-hidden ${isDisponivel ? 'hover:border-brand/50 hover:shadow-xl' : 'opacity-80'} transition-all duration-300 flex flex-col relative group">
                 ${badgeHTML}
+                ${shareButtonHTML}
                 <div class="h-32 md:h-48 relative overflow-hidden bg-gray-100 border-b border-gray-200">
                     <img src="${v.imagem_banner}" class="w-full h-full object-cover transform ${isDisponivel ? 'group-hover:scale-105' : 'grayscale'} transition duration-500" alt="${v.titulo}">
                 </div>
@@ -35,12 +43,12 @@ module.exports = function renderVagas(vagas = []) {
                 <div class="p-5 md:p-6 flex flex-col flex-grow">
                     <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-4 md:mb-6">${v.titulo}</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm text-gray-600 mb-5 md:mb-6 flex-grow">
-                        <div class="flex items-start"><i class="fa-solid fa-money-bill-wave text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Salário</strong> ${v.salario}</div></div>
-                        <div class="flex items-start"><i class="fa-solid fa-location-dot text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Local</strong> ${v.local_residencia}</div></div>
-                        <div class="flex items-start"><i class="fa-regular fa-clock text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Horário</strong> ${v.disponibilidade}</div></div>
-                        <div class="flex items-start"><i class="fa-solid fa-briefcase text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Experiência</strong> ${v.experiencia}</div></div>
-                        <div class="col-span-full flex items-start"><i class="fa-solid fa-graduation-cap text-brand mt-0.5 md:mt-1 w-5 md:w-6"></i> <div><strong class="block text-gray-900">Conhecimentos</strong> ${v.conhecimento}</div></div>
+                    <div class="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm text-gray-600 mb-5 md:mb-6 flex-grow">
+                        <div class="flex items-start"><i class="fa-solid fa-money-bill-wave text-brand mt-0.5 md:mt-1 w-5 md:w-6 shrink-0"></i> <div><strong class="block text-gray-900">Salário</strong> ${v.salario}</div></div>
+                        <div class="flex items-start"><i class="fa-solid fa-location-dot text-brand mt-0.5 md:mt-1 w-5 md:w-6 shrink-0"></i> <div><strong class="block text-gray-900">Local</strong> ${v.local_residencia}</div></div>
+                        <div class="flex items-start"><i class="fa-regular fa-clock text-brand mt-0.5 md:mt-1 w-5 md:w-6 shrink-0"></i> <div><strong class="block text-gray-900">Horário</strong> ${v.disponibilidade}</div></div>
+                        <div class="flex items-start"><i class="fa-solid fa-briefcase text-brand mt-0.5 md:mt-1 w-5 md:w-6 shrink-0"></i> <div><strong class="block text-gray-900">Experiência</strong> ${v.experiencia}</div></div>
+                        <div class="col-span-full flex items-start"><i class="fa-solid fa-graduation-cap text-brand mt-0.5 md:mt-1 w-5 md:w-6 shrink-0"></i> <div><strong class="block text-gray-900">Conhecimentos</strong> ${v.conhecimento}</div></div>
                     </div>
 
                     <div class="bg-brandLight/30 p-3 md:p-4 rounded-lg mb-5 md:mb-8 border border-brand/10">
@@ -61,6 +69,12 @@ module.exports = function renderVagas(vagas = []) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta property="og:title" content="Vagas de Emprego | Ecocaixas" />
+        <meta property="og:description" content="Faça parte do nosso time! Confira as vagas abertas na Ecocaixas e envie seu currículo." />
+        <meta property="og:image" content="/fabrica.png" />
+        <meta property="og:type" content="website" />
+        
         <title>Trabalhe Conosco | Ecocaixas</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -190,6 +204,29 @@ module.exports = function renderVagas(vagas = []) {
         </div>
 
         <script>
+            // Lógica do Web Share API Nativo
+            async function compartilharVaga(titulo, salario) {
+                const urlSite = window.location.href;
+                const textoCompartilhamento = \`Vaga aberta para \${titulo} na Ecocaixas!\\nSalário: \${salario}\\n\\nEnvie seu currículo agora acessando:\\n\`;
+                
+                // Verifica se o navegador/celular suporta a janela nativa de compartilhamento
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: \`Vaga: \${titulo} - Ecocaixas\`,
+                            text: textoCompartilhamento,
+                            url: urlSite
+                        });
+                    } catch (err) {
+                        console.log('Compartilhamento cancelado ou falhou', err);
+                    }
+                } else {
+                    // Fallback para computadores antigos: Redireciona para o WhatsApp Web
+                    const fallbackUrl = \`https://wa.me/?text=\${encodeURIComponent(textoCompartilhamento + urlSite)}\`;
+                    window.open(fallbackUrl, '_blank');
+                }
+            }
+
             function abrirModalVaga(id, titulo) {
                 document.getElementById('inputIdVaga').value = id;
                 document.getElementById('nomeVagaModal').innerText = titulo;
