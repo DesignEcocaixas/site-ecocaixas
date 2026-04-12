@@ -140,24 +140,84 @@ module.exports = function renderVagas(vagas = []) {
             </div>
         </section>
 
-        <footer class="bg-gray-900 py-6 border-t border-gray-800 mt-auto relative z-10">
-            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
+        <footer class="bg-gray-900 pt-16 pb-8 border-t border-gray-800 mt-auto relative z-10 text-gray-400">
+            <div class="container mx-auto px-6 max-w-6xl">
                 
-                <div class="mb-4 md:mb-0 text-center md:text-left">
-                    <span class="text-white font-bold tracking-wider">Ecocaixas</span> &copy; 2026 — Todos os direitos reservados.
-                </div>
-                
-                <div class="flex items-center justify-center md:justify-end space-x-3">
-                    <span class="text-xs">Desenvolvido por <a href="https://www.instagram.com/71dev_/" target="_blank" class="text-white font-bold hover:text-brand transition-colors">71dev</a></span>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
                     
-                    <span class="w-px h-4 bg-gray-700 mx-2"></span> <a href="https://www.instagram.com/71dev_/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-white transition-colors duration-300 text-lg" aria-label="Instagram da 71dev">
-                        <i class="fa-brands fa-instagram"></i>
-                    </a>
-                    <a href="https://wa.me/5571983174920" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-[#25D366] transition-colors duration-300 text-lg" aria-label="WhatsApp da 71dev">
-                        <i class="fa-brands fa-whatsapp"></i>
-                    </a>
+                    <div>
+                        <img src="/logo.png" alt="Logo Ecocaixas" class="h-12 w-auto mb-6 brightness-0 invert opacity-90">
+                        <p class="text-sm mb-6 leading-relaxed">Sua parceira em embalagens sob medida para os setores alimentício e industrial.</p>
+                        
+                        <div class="flex space-x-3">
+                            <a href="https://www.instagram.com/ecocaixasba/" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-brand hover:-translate-y-1 transition-all" aria-label="Instagram">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="https://www.facebook.com/ecocaixasba/" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-[#1877F2] hover:-translate-y-1 transition-all" aria-label="Facebook">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="https://wa.me/5571987780304" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-[#25D366] hover:-translate-y-1 transition-all" aria-label="WhatsApp">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-white font-black text-lg mb-6 tracking-wide">Mapa do Site</h4>
+                        <ul class="space-y-3 text-sm font-medium">
+                            <li><a href="/#produtos" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> Destaques</a></li>
+                            <li><a href="/#setores" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> Setores de Atuação</a></li>
+                            <li><a href="/#catalogo" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> Catálogo</a></li>
+                            <li><a href="/#sobre" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> A Fábrica</a></li>
+                            <li><a href="/vagas" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> Vagas de Emprego</a></li>
+                            <li><a href="/#contato" class="hover:text-brand transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[10px] mr-2 text-brand"></i> Fazer Orçamento</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-white font-black text-lg mb-6 tracking-wide">Localização</h4>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start">
+                                <i class="fa-solid fa-location-dot mt-1.5 mr-3 text-brand text-lg"></i>
+                                <span class="leading-relaxed">Rua Alameda - Jardim Limoeiro,<br>Camaçari-BA, CEP 42801-141</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa-solid fa-id-card mr-3 text-brand text-lg"></i>
+                                <span>CNPJ: 22.570.982/0001-90</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="h-48 md:h-full min-h-[160px] rounded-2xl overflow-hidden border border-gray-700 shadow-inner relative group">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            frameborder="0" 
+                            scrolling="no" 
+                            marginheight="0" 
+                            marginwidth="0" 
+                            src="https://maps.google.com/maps?q=Ecocaixas%20Ba&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                            class="absolute inset-0 grayscale group-hover:grayscale-0 transition-all duration-700">
+                        </iframe>
+                    </div>
+
                 </div>
 
+                <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 space-y-4 md:space-y-0 text-center md:text-left">
+                    
+                    <div class="leading-relaxed">
+                        <span class="text-gray-300 font-bold">Ecocaixas © 2026. Todos os direitos reservados.</span><br>
+                        Ecocaixas comercio e personalização de caixas de papelão Ltda.
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 bg-gray-800/50 px-5 py-2.5 rounded-full border border-gray-700/50 hover:border-gray-600 transition-colors">
+                        <span>Desenvolvido por <a href="https://www.instagram.com/71dev_/" target="_blank" class="text-gray-300 font-bold hover:text-brand transition-colors">71dev</a></span>
+                        <span class="w-px h-4 bg-gray-600 mx-1"></span> 
+                        <a href="https://www.instagram.com/71dev_/" target="_blank" aria-label="Instagram da 71dev" class="hover:text-white transition-colors text-base"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://wa.me/5571983174920" target="_blank" aria-label="WhatsApp da 71dev" class="hover:text-[#25D366] transition-colors text-base"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+
+                </div>
             </div>
         </footer>
 
