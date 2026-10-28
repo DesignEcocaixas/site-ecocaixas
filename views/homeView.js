@@ -434,7 +434,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="mt-8 flex flex-col md:flex-row justify-between gap-3">
                             <button type="button" onclick="prevStep()" class="w-full md:w-auto bg-gray-100 text-gray-600 font-bold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center justify-center order-2 md:order-1"><i class="fa-solid fa-arrow-left mr-2"></i> Voltar</button>
                             <button type="submit" class="w-full md:w-auto px-6 py-2.5 flex justify-center items-center bg-[#25D366] hover:bg-[#1fae53] text-white font-bold rounded-lg transition-colors shadow-sm text-sm order-1 md:order-2">
-                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Enviar pelo WhatsApp
+                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Solicitar orçamento
                             </button>
                         </div>
                     </div>
