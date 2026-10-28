@@ -43,7 +43,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
     if(alimenticioCards) alimenticioCards += alimenticioCards;
     if(industrialCards) industrialCards += industrialCards;
 
-    const fallbackHTML = `<div class="swiper-slide bg-gray-50 p-10 text-center rounded-xl border border-gray-200"><i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-bold text-sm">Nenhum modelo cadastrado nesta seção.</p></div>`;
+    const fallbackHTML = `<div class="swiper-slide bg-gray-50 p-10 text-center rounded-xl border border-gray-200"><i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-bold text-sm">Nenhum modelo cadastrado nesta secção.</p></div>`;
     
     const tituloEmpresa = empresaInfo.titulo || 'Nossa Raiz, Nossa Força';
     const textoEmpresa = empresaInfo.texto_historia ? empresaInfo.texto_historia.replace(/\n/g, '<br><br>') : 'A história da nossa fábrica será contada aqui em breve.';
@@ -117,7 +117,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             input[type=range].video-progress:focus { outline: none; }
         </style>
     </head>
-    <body class="text-gray-800 antialiased selection:bg-brand selection:text-white">
+    <body class="text-gray-800 antialiased selection:bg-brand selection:text-white relative">
 
         <header class="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="container mx-auto max-w-6xl px-6 lg:px-16 py-4 flex justify-between items-center relative z-50 bg-transparent">
@@ -154,6 +154,9 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
         </header>
 
         <section id="produtos" class="relative pt-16 pb-20 overflow-hidden">
+            <!-- Decoração Transparente SVG 4 -->
+            <img src="/4.svg" class="absolute top-10 right-[-5%] w-56 md:w-80 opacity-20 rotate-12 z-0 pointer-events-none select-none" alt="">
+            
             <div class="absolute inset-0 z-0">
                 <img src="/fabrica2.png" class="w-full h-full object-cover opacity-100" alt="Fábrica Ecocaixas">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#fbfbfb]/60 to-gray-50"></div>
@@ -176,67 +179,62 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
-        <!-- SEÇÃO SETORES COM PLAYER DE VÍDEO CUSTOMIZADO -->
-        <section id="setores" class="py-16 md:py-20 bg-white relative">
-            <div class="container mx-auto max-w-6xl px-6 lg:px-16">
+        <!-- SECÇÃO SETORES COM PLAYER DE VÍDEO CUSTOMIZADO E MARCAS D'ÁGUA EM SVG -->
+        <section id="setores" class="py-16 md:py-20 bg-white relative overflow-hidden">
+            <!-- Decoração Transparente de Fundo SVG 1 e 5 -->
+            <img src="/1.svg" class="absolute top-20 left-[-5%] w-64 md:w-96 opacity-20 rotate-12 z-0 pointer-events-none select-none" alt="">
+            <img src="/5.svg" class="absolute bottom-10 right-[-2%] w-56 md:w-80 opacity-15 -rotate-12 z-0 pointer-events-none select-none" alt="">
+            
+            <div class="container mx-auto max-w-6xl px-6 lg:px-16 relative z-10">
                 <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-10 md:mb-12 text-center tracking-tight" data-aos="fade-up">Feito para o seu setor.</h2>
                 
                 <div class="grid lg:grid-cols-2 gap-6 md:gap-10 items-center">
                     
                     <div class="flex flex-col gap-6" data-aos="fade-right" data-aos-duration="1000">
-                        <div class="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-brandLight hover:border-brand/40 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full">
-                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-brand">
+                        <div class="bg-white rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-brandLight hover:border-brand/40 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full relative overflow-hidden">
+                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-brand z-10">
                                 <i class="fa-solid fa-burger"></i>
                             </div>
-                            <div>
+                            <div class="z-10">
                                 <h4 class="text-xl md:text-2xl font-black text-gray-900 mb-2">Setor Alimentício / Delivery</h4>
-                                <p class="text-gray-600 leading-relaxed text-sm">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
+                                <p class="text-gray-600 leading-relaxed text-sm">Embalagens atóxicas e térmicas. Papelão certificado para contacto seguro com alimentos.</p>
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full">
-                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-gray-800">
+                        <div class="bg-white rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full relative overflow-hidden">
+                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-gray-800 z-10">
                                 <i class="fa-solid fa-industry"></i>
                             </div>
-                            <div>
+                            <div class="z-10">
                                 <h4 class="text-xl md:text-2xl font-black text-gray-900 mb-2">Setor Industrial / E-commerce</h4>
                                 <p class="text-gray-600 leading-relaxed text-sm">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- PLAYER DE VÍDEO 16:9 (1920x1080) -->
-                    <!-- Adicionado #t=2 na URL para extrair o frame do segundo 2 nativamente -->
+                    <!-- PLAYER DE VÍDEO 16:9 -->
                     <div id="videoContainer" class="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200 group bg-black cursor-pointer" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                        
                         <video id="ecoVideo" src="/institucional-ecocaixas-2026.mp4#t=2" preload="metadata" class="absolute inset-0 w-full h-full object-cover">
-                            Seu navegador não suporta a tag de vídeo.
+                            O seu navegador não suporta a tag de vídeo.
                         </video>
                         
-                        <!-- Overlay e Botão Play Central -->
                         <div id="centerPlayOverlay" class="absolute inset-0 bg-black/30 flex items-center justify-center transition-all duration-300 pointer-events-none group-hover:bg-black/10">
                             <button id="centerPlayBtn" class="w-16 h-16 md:w-20 md:h-20 bg-brand text-white rounded-full flex items-center justify-center text-2xl md:text-3xl hover:bg-brandDark hover:scale-110 transition-all shadow-xl pointer-events-auto">
                                 <i class="fa-solid fa-play ml-1.5 md:ml-2"></i>
                             </button>
                         </div>
 
-                        <!-- Barra de Controles Inferior -->
                         <div id="videoControls" class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-4 flex items-center gap-3 md:gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
-                            
                             <button id="playPauseBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
                                 <i class="fa-solid fa-play text-sm md:text-base"></i>
                             </button>
-                            
                             <div class="flex-grow flex items-center relative">
                                 <input type="range" id="progressBar" class="video-progress w-full h-1.5" value="0" min="0" step="0.1">
                             </div>
-                            
                             <span id="timeDisplay" class="text-white text-[10px] md:text-xs font-medium font-mono whitespace-nowrap">00:00 / 00:00</span>
-                            
                             <button id="muteBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
                                 <i class="fa-solid fa-volume-high text-sm md:text-base"></i>
                             </button>
-                            
                             <button id="fullScreenBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
                                 <i class="fa-solid fa-expand text-sm md:text-base"></i>
                             </button>
@@ -247,8 +245,14 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
-        <section id="catalogo" class="py-16 md:py-20 bg-gray-50">
-            <div class="container mx-auto max-w-6xl px-6 lg:px-16">
+        <!-- SECÇÃO CATÁLOGO -->
+        <section id="catalogo" class="py-16 md:py-20 bg-gray-50 relative overflow-hidden">
+            <!-- Decoração Transparente de Fundo SVG 2, 3 e 6 -->
+            <img src="/2.svg" class="absolute bottom-10 right-[-5%] w-72 md:w-[400px] opacity-20 -rotate-12 z-0 pointer-events-none select-none" alt="">
+            <img src="/3.svg" class="absolute top-1/3 left-[-5%] w-48 md:w-64 opacity-20 rotate-45 z-0 pointer-events-none select-none" alt="">
+            <img src="/6.svg" class="absolute top-20 right-[10%] w-40 md:w-56 opacity-15 rotate-90 z-0 pointer-events-none select-none" alt="">
+            
+            <div class="container mx-auto max-w-6xl px-6 lg:px-16 relative z-10">
                 <div class="text-center mb-12" data-aos="fade-up">
                     <span class="text-brand font-bold tracking-widest uppercase text-xs mb-2 block">Nosso Portfólio</span>
                     <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight">Catálogo de Produtos</h2>
@@ -349,10 +353,15 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
-        <section id="contato" class="py-16 md:py-20 bg-gray-50 relative">
+        <section id="contato" class="py-16 md:py-20 bg-gray-50 relative overflow-hidden">
+            <!-- Decoração Transparente de Fundo SVG 1, 2 e 7 -->
+            <img src="/1.svg" class="absolute bottom-20 right-[-5%] w-64 md:w-80 opacity-20 rotate-90 z-0 pointer-events-none select-none" alt="">
+            <img src="/2.svg" class="absolute top-20 left-[-2%] w-56 md:w-72 opacity-15 -rotate-12 z-0 pointer-events-none select-none" alt="">
+            <img src="/7.svg" class="absolute bottom-1/3 left-[5%] w-48 md:w-64 opacity-20 rotate-180 z-0 pointer-events-none select-none" alt="">
+            
             <div class="container mx-auto max-w-3xl px-6 relative z-10">
                 <div class="text-center mb-10" data-aos="fade-down">
-                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 tracking-tight">Monte seu Pedido</h2>
+                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 tracking-tight">Monte o seu Pedido</h2>
                     <p class="text-gray-500 text-sm md:text-base">Processo rápido e direto para o WhatsApp do seu setor.</p>
                 </div>
 
@@ -380,14 +389,14 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     
                     <!-- PASSO 1: DADOS -->
                     <div id="step-1" class="wizard-step block animate-step">
-                        <h3 class="text-lg md:text-xl font-black text-gray-900 mb-5 border-b border-gray-100 pb-3">Dados de Contato</h3>
+                        <h3 class="text-lg md:text-xl font-black text-gray-900 mb-5 border-b border-gray-100 pb-3">Dados de Contacto</h3>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nome da Empresa</label>
-                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
+                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="empresa" required placeholder="Ex: Mercado Silva Lda">
                             </div>
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Seu Nome e Contato</label>
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">O Seu Nome e Contacto</label>
                                 <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
                             </div>
                         </div>
@@ -435,7 +444,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                             </div>
                             <div id="listaPedidos" class="space-y-3">
                                 <div class="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-500 font-medium text-sm" id="emptyState">
-                                    Seu carrinho está vazio. Adicione os modelos acima.
+                                    O seu carrinho está vazio. Adicione os modelos acima.
                                 </div>
                             </div>
                         </div>
@@ -452,7 +461,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         
                         <div class="mb-6">
                             <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
-                            <textarea class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
+                            <textarea class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão do logótipo..."></textarea>
                         </div>
 
                         <div class="border border-gray-200 rounded-lg p-4 md:p-5 mb-6 bg-gray-50/50">
@@ -462,21 +471,19 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                                     <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1.5">Forma de Pagamento</label>
                                     <select id="formaPagamento" class="w-full bg-white px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors" required onchange="toggleBandeirasCartao()">
                                         <option value="" disabled selected>Selecione...</option>
-                                        <option value="À vista (Pix/Transferência)">À vista (Pix/Transferência)</option>
+                                        <option value="A pronto (MB Way/Transferência)">A pronto (MB Way/Transferência)</option>
                                         <option value="Cartão de Crédito">Cartão de Crédito</option>
                                         <option value="Cartão de Débito">Cartão de Débito</option>
                                     </select>
                                 </div>
                                 
                                 <div id="containerBandeira" class="hidden">
-                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1.5">Bandeira do Cartão</label>
+                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1.5">Rede do Cartão</label>
                                     <select id="bandeiraCartao" class="w-full bg-white px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors">
-                                        <option value="" disabled selected>Selecione a bandeira...</option>
+                                        <option value="" disabled selected>Selecione a rede...</option>
                                         <option value="Visa">Visa</option>
                                         <option value="Mastercard">Mastercard</option>
-                                        <option value="Elo">Elo</option>
-                                        <option value="Hipercard">Hipercard</option>
-                                        <option value="American Express">American Express</option>
+                                        <option value="Multibanco">Multibanco</option>
                                     </select>
                                 </div>
                             </div>
@@ -485,7 +492,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="mt-8 flex flex-col md:flex-row justify-between gap-3">
                             <button type="button" onclick="prevStep()" class="w-full md:w-auto bg-gray-100 text-gray-600 font-bold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center justify-center order-2 md:order-1"><i class="fa-solid fa-arrow-left mr-2"></i> Voltar</button>
                             <button type="submit" class="w-full md:w-auto px-6 py-2.5 flex justify-center items-center bg-[#25D366] hover:bg-[#1fae53] text-white font-bold rounded-lg transition-colors shadow-sm text-sm order-1 md:order-2">
-                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Enviar pelo WhatsApp
+                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Solicitar orçamento
                             </button>
                         </div>
                     </div>
@@ -533,11 +540,11 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <ul class="space-y-3 text-xs md:text-sm">
                             <li class="flex items-start">
                                 <i class="fa-solid fa-location-dot mt-1 mr-2.5 text-brand text-base"></i>
-                                <span class="leading-relaxed">Rua Alameda - Jardim Limoeiro,<br>Camaçari-BA, CEP 42801-141</span>
+                                <span class="leading-relaxed">Rua Alameda - Jardim Limoeiro,<br>Camaçari-BA, Código Postal 42801-141</span>
                             </li>
                             <li class="flex items-center">
                                 <i class="fa-solid fa-id-card mr-2.5 text-brand text-base"></i>
-                                <span>CNPJ: 22.570.982/0001-90</span>
+                                <span>NIF: 22.570.982/0001-90</span>
                             </li>
                         </ul>
                     </div>
@@ -561,7 +568,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     
                     <div class="leading-relaxed">
                         <span class="text-gray-300 font-bold">Ecocaixas © 2026. Todos os direitos reservados.</span><br>
-                        Ecocaixas comercio e personalização de caixas de papelão Ltda.
+                        Ecocaixas comércio e personalização de caixas de papelão Lda.
                     </div>
                     
                     <div class="flex items-center space-x-3 bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50 hover:border-gray-600 transition-colors">
@@ -580,7 +587,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             <div class="container mx-auto max-w-6xl px-6 lg:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="text-sm text-gray-600">
                     <h4 class="font-black text-gray-900 mb-1"><i class="fa-solid fa-cookie-bite text-brand mr-1"></i> Nós usamos cookies</h4>
-                    <p>Utilizamos cookies para melhorar sua experiência, analisar o tráfego e personalizar conteúdos. Ao continuar navegando, você concorda com a nossa política.</p>
+                    <p>Utilizamos cookies para melhorar a sua experiência, analisar o tráfego e personalizar conteúdos. Ao continuar a navegar, concorda com a nossa política.</p>
                 </div>
                 <div class="flex items-center gap-3 shrink-0 w-full md:w-auto">
                     <button onclick="recusarCookies()" class="flex-1 md:flex-none px-5 py-2.5 rounded-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors text-sm">Recusar</button>
@@ -619,7 +626,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 
                 <div class="p-6 md:p-8">
                     <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-2">${vagaAtiva.titulo}</h3>
-                    <p class="text-gray-500 text-xs md:text-sm mb-5">Preencha os dados e anexe seu currículo (PDF ou Imagem).</p>
+                    <p class="text-gray-500 text-xs md:text-sm mb-5">Preencha os dados e anexe o seu currículo (PDF ou Imagem).</p>
                     
                     <form action="/vagas/candidatar" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="vaga_id" value="${vagaAtiva.id}">
@@ -627,10 +634,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
                                 <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1">Candidato</label>
-                                <input type="text" name="nome" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none text-sm focus:border-brand focus:ring-1 focus:ring-brand" required placeholder="Seu nome">
+                                <input type="text" name="nome" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none text-sm focus:border-brand focus:ring-1 focus:ring-brand" required placeholder="O seu nome">
                             </div>
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1">Contato</label>
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1">Contacto</label>
                                 <input type="text" name="contato" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none text-sm focus:border-brand focus:ring-1 focus:ring-brand" required placeholder="(71) 90000">
                             </div>
                         </div>
@@ -738,7 +745,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
 
                     function togglePlay() {
                         if (video.paused) {
-                            // Se for o primeiro play e a thumb estava ativa, zera o vídeo para começar do início
                             if(!videoIniciado) {
                                 video.currentTime = 0;
                                 videoIniciado = true;
@@ -820,7 +826,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 const banner = document.getElementById('cookieBanner');
                 const wppBtn = document.getElementById('whatsappBtn');
                 if(banner) banner.classList.add('translate-y-full');
-                // Retorna o botão do WhatsApp para a posição original (bottom-6 ou 24px)
                 if(wppBtn) wppBtn.style.bottom = '1.5rem';
             }
 
