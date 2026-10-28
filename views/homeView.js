@@ -106,9 +106,15 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             .slot-2 { bottom: 0; left: 0; width: 48%; height: 38%; z-index: 1; }
             .slot-3 { bottom: 0; right: 0; width: 48%; height: 38%; z-index: 1; }
             
-            /* Animação do Wizard */
             @keyframes stepFadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
             .animate-step { animation: stepFadeIn 0.3s ease-out forwards; }
+            
+            /* Custom Video Slider Styles */
+            input[type=range].video-progress { -webkit-appearance: none; background: transparent; }
+            input[type=range].video-progress::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #029723; cursor: pointer; margin-top: -4px; box-shadow: 0 0 5px rgba(0,0,0,0.3); transition: transform 0.2s; }
+            input[type=range].video-progress::-webkit-slider-thumb:hover { transform: scale(1.3); }
+            input[type=range].video-progress::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255, 255, 255, 0.4); border-radius: 2px; }
+            input[type=range].video-progress:focus { outline: none; }
         </style>
     </head>
     <body class="text-gray-800 antialiased selection:bg-brand selection:text-white">
@@ -170,25 +176,71 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
+        <!-- SEÇÃO SETORES COM PLAYER DE VÍDEO CUSTOMIZADO -->
         <section id="setores" class="py-16 md:py-20 bg-white relative">
             <div class="container mx-auto max-w-6xl px-6 lg:px-16">
-                <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-12 text-center tracking-tight" data-aos="fade-up">Feito para o seu setor.</h2>
-                <div class="grid lg:grid-cols-2 gap-6 md:gap-10">
+                <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-10 md:mb-12 text-center tracking-tight" data-aos="fade-up">Feito para o seu setor.</h2>
+                
+                <div class="grid lg:grid-cols-2 gap-6 md:gap-10 items-center">
                     
-                    <div class="bg-gray-50 rounded-xl p-8 md:p-10 border border-gray-200 hover:bg-brandLight hover:border-brand/40 transition-colors duration-300 group shadow-sm" data-aos="fade-right" data-aos-duration="1000">
-                        <div class="w-16 h-16 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-3xl mb-6 text-brand">
-                            <i class="fa-solid fa-burger"></i>
+                    <div class="flex flex-col gap-6" data-aos="fade-right" data-aos-duration="1000">
+                        <div class="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-brandLight hover:border-brand/40 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full">
+                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-brand">
+                                <i class="fa-solid fa-burger"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl md:text-2xl font-black text-gray-900 mb-2">Setor Alimentício / Delivery</h4>
+                                <p class="text-gray-600 leading-relaxed text-sm">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
+                            </div>
                         </div>
-                        <h4 class="text-2xl font-black text-gray-900 mb-3">Setor Alimentício / Delivery</h4>
-                        <p class="text-gray-600 mb-6 leading-relaxed text-sm md:text-base">Embalagens atóxicas e térmicas. Papelão certificado para contato seguro com alimentos.</p>
+
+                        <div class="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-200 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5 h-full">
+                            <div class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-2xl md:text-3xl text-gray-800">
+                                <i class="fa-solid fa-industry"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl md:text-2xl font-black text-gray-900 mb-2">Setor Industrial / E-commerce</h4>
+                                <p class="text-gray-600 leading-relaxed text-sm">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="bg-gray-50 rounded-xl p-8 md:p-10 border border-gray-200 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300 group shadow-sm" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                        <div class="w-16 h-16 bg-white rounded-lg border border-gray-300 shadow-sm flex items-center justify-center text-3xl mb-6 text-gray-800">
-                            <i class="fa-solid fa-industry"></i>
+                    <!-- PLAYER DE VÍDEO 16:9 (1920x1080) -->
+                    <!-- Adicionado #t=2 na URL para extrair o frame do segundo 2 nativamente -->
+                    <div id="videoContainer" class="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200 group bg-black cursor-pointer" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                        
+                        <video id="ecoVideo" src="/institucional-ecocaixas-2026.mp4#t=2" preload="metadata" class="absolute inset-0 w-full h-full object-cover">
+                            Seu navegador não suporta a tag de vídeo.
+                        </video>
+                        
+                        <!-- Overlay e Botão Play Central -->
+                        <div id="centerPlayOverlay" class="absolute inset-0 bg-black/30 flex items-center justify-center transition-all duration-300 pointer-events-none group-hover:bg-black/10">
+                            <button id="centerPlayBtn" class="w-16 h-16 md:w-20 md:h-20 bg-brand text-white rounded-full flex items-center justify-center text-2xl md:text-3xl hover:bg-brandDark hover:scale-110 transition-all shadow-xl pointer-events-auto">
+                                <i class="fa-solid fa-play ml-1.5 md:ml-2"></i>
+                            </button>
                         </div>
-                        <h4 class="text-2xl font-black text-gray-900 mb-3">Setor Industrial / E-commerce</h4>
-                        <p class="text-gray-600 mb-6 leading-relaxed text-sm md:text-base">Soluções robustas de alta gramatura. Integridade garantida no transporte pesado.</p>
+
+                        <!-- Barra de Controles Inferior -->
+                        <div id="videoControls" class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-4 flex items-center gap-3 md:gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+                            
+                            <button id="playPauseBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
+                                <i class="fa-solid fa-play text-sm md:text-base"></i>
+                            </button>
+                            
+                            <div class="flex-grow flex items-center relative">
+                                <input type="range" id="progressBar" class="video-progress w-full h-1.5" value="0" min="0" step="0.1">
+                            </div>
+                            
+                            <span id="timeDisplay" class="text-white text-[10px] md:text-xs font-medium font-mono whitespace-nowrap">00:00 / 00:00</span>
+                            
+                            <button id="muteBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
+                                <i class="fa-solid fa-volume-high text-sm md:text-base"></i>
+                            </button>
+                            
+                            <button id="fullScreenBtn" class="text-white hover:text-brand transition-colors transform hover:scale-110 w-6 flex justify-center">
+                                <i class="fa-solid fa-expand text-sm md:text-base"></i>
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -297,7 +349,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
-        <!-- SEÇÃO ORÇAMENTO WIZARD -->
         <section id="contato" class="py-16 md:py-20 bg-gray-50 relative">
             <div class="container mx-auto max-w-3xl px-6 relative z-10">
                 <div class="text-center mb-10" data-aos="fade-down">
@@ -434,7 +485,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                         <div class="mt-8 flex flex-col md:flex-row justify-between gap-3">
                             <button type="button" onclick="prevStep()" class="w-full md:w-auto bg-gray-100 text-gray-600 font-bold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center justify-center order-2 md:order-1"><i class="fa-solid fa-arrow-left mr-2"></i> Voltar</button>
                             <button type="submit" class="w-full md:w-auto px-6 py-2.5 flex justify-center items-center bg-[#25D366] hover:bg-[#1fae53] text-white font-bold rounded-lg transition-colors shadow-sm text-sm order-1 md:order-2">
-                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Solicitar orçamento
+                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Enviar pelo WhatsApp
                             </button>
                         </div>
                     </div>
@@ -524,7 +575,21 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </footer>
 
-        <a href="https://wa.me/5571987780304" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-3 rounded-lg shadow-xl hover:bg-[#1fae53] transition-colors z-40 flex items-center justify-center h-14 w-14"><i class="fa-brands fa-whatsapp text-2xl"></i></a>
+        <!-- BANNER DE COOKIES -->
+        <div id="cookieBanner" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[120] transform translate-y-full transition-transform duration-500">
+            <div class="container mx-auto max-w-6xl px-6 lg:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-gray-600">
+                    <h4 class="font-black text-gray-900 mb-1"><i class="fa-solid fa-cookie-bite text-brand mr-1"></i> Nós usamos cookies</h4>
+                    <p>Utilizamos cookies para melhorar sua experiência, analisar o tráfego e personalizar conteúdos. Ao continuar navegando, você concorda com a nossa política.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 w-full md:w-auto">
+                    <button onclick="recusarCookies()" class="flex-1 md:flex-none px-5 py-2.5 rounded-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors text-sm">Recusar</button>
+                    <button onclick="aceitarCookies()" class="flex-1 md:flex-none px-5 py-2.5 rounded-lg font-bold bg-gray-900 text-white hover:bg-brand transition-colors text-sm shadow-sm">Aceitar Todos</button>
+                </div>
+            </div>
+        </div>
+
+        <a id="whatsappBtn" href="https://wa.me/5571987780304" target="_blank" class="fixed bottom-6 right-6 bg-[#25D366] text-white p-3 rounded-lg shadow-xl hover:bg-[#1fae53] transition-all duration-500 ease-in-out z-40 flex items-center justify-center h-14 w-14"><i class="fa-brands fa-whatsapp text-2xl"></i></a>
 
        ${popupAtivo ? `
         <div id="popupInicial" class="fixed inset-0 bg-gray-900/80 backdrop-blur-md z-[100] hidden flex items-center justify-center transition-opacity opacity-0 px-4" style="transition: opacity 0.4s ease;">
@@ -641,6 +706,124 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 }
             }, 4000);
 
+            // GESTÃO DE COOKIES E ALINHAMENTO DO WPP
+            document.addEventListener('DOMContentLoaded', () => {
+                const cookieConsent = localStorage.getItem('ecoCookiesConsent');
+                if (!cookieConsent) {
+                    setTimeout(() => {
+                        const banner = document.getElementById('cookieBanner');
+                        const wppBtn = document.getElementById('whatsappBtn');
+                        if (banner) {
+                            banner.classList.remove('translate-y-full');
+                            // Empurra o botão do WhatsApp para cima para não ficar oculto pelo banner
+                            if (wppBtn) {
+                                wppBtn.style.bottom = (banner.offsetHeight + 24) + 'px';
+                            }
+                        }
+                    }, 2000);
+                }
+                
+                // Inicializa o Player Customizado se existir
+                const video = document.getElementById('ecoVideo');
+                const videoContainer = document.getElementById('videoContainer');
+                if (video && videoContainer) {
+                    const playPauseBtn = document.getElementById('playPauseBtn');
+                    const centerPlayBtn = document.getElementById('centerPlayBtn');
+                    const progressBar = document.getElementById('progressBar');
+                    const muteBtn = document.getElementById('muteBtn');
+                    const timeDisplay = document.getElementById('timeDisplay');
+                    const fullScreenBtn = document.getElementById('fullScreenBtn');
+
+                    let videoIniciado = false;
+
+                    function togglePlay() {
+                        if (video.paused) {
+                            // Se for o primeiro play e a thumb estava ativa, zera o vídeo para começar do início
+                            if(!videoIniciado) {
+                                video.currentTime = 0;
+                                videoIniciado = true;
+                            }
+                            
+                            video.play();
+                            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause text-sm md:text-base"></i>';
+                            centerPlayBtn.classList.add('opacity-0', 'scale-150', 'pointer-events-none');
+                        } else {
+                            video.pause();
+                            playPauseBtn.innerHTML = '<i class="fa-solid fa-play text-sm md:text-base"></i>';
+                            centerPlayBtn.classList.remove('opacity-0', 'scale-150', 'pointer-events-none');
+                        }
+                    }
+
+                    playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+                    centerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+                    video.addEventListener('click', togglePlay);
+
+                    muteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        video.muted = !video.muted;
+                        muteBtn.innerHTML = video.muted ? '<i class="fa-solid fa-volume-xmark text-sm md:text-base"></i>' : '<i class="fa-solid fa-volume-high text-sm md:text-base"></i>';
+                    });
+
+                    fullScreenBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (!document.fullscreenElement) {
+                            if(videoContainer.requestFullscreen) videoContainer.requestFullscreen();
+                            else if(videoContainer.webkitRequestFullscreen) videoContainer.webkitRequestFullscreen();
+                        } else {
+                            if(document.exitFullscreen) document.exitFullscreen();
+                        }
+                    });
+
+                    function formatTime(secTotal) {
+                        const min = Math.floor(secTotal / 60);
+                        const sec = Math.floor(secTotal % 60);
+                        return (min < 10 ? '0' + min : min) + ':' + (sec < 10 ? '0' + sec : sec);
+                    }
+
+                    video.addEventListener('loadedmetadata', () => {
+                        timeDisplay.innerText = '00:00 / ' + formatTime(video.duration);
+                    });
+
+                    video.addEventListener('timeupdate', () => {
+                        if(video.duration) {
+                            progressBar.value = (video.currentTime / video.duration) * 100;
+                            timeDisplay.innerText = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+                        }
+                    });
+
+                    progressBar.addEventListener('input', (e) => {
+                        e.stopPropagation();
+                        const time = (e.target.value / 100) * video.duration;
+                        video.currentTime = time;
+                    });
+                    
+                    progressBar.addEventListener('click', (e) => e.stopPropagation());
+
+                    video.addEventListener('ended', () => {
+                        playPauseBtn.innerHTML = '<i class="fa-solid fa-play text-sm md:text-base"></i>';
+                        centerPlayBtn.classList.remove('opacity-0', 'scale-150', 'pointer-events-none');
+                    });
+                }
+            });
+
+            function aceitarCookies() {
+                localStorage.setItem('ecoCookiesConsent', 'accepted');
+                fecharCookieBanner();
+            }
+
+            function recusarCookies() {
+                localStorage.setItem('ecoCookiesConsent', 'declined');
+                fecharCookieBanner();
+            }
+
+            function fecharCookieBanner() {
+                const banner = document.getElementById('cookieBanner');
+                const wppBtn = document.getElementById('whatsappBtn');
+                if(banner) banner.classList.add('translate-y-full');
+                // Retorna o botão do WhatsApp para a posição original (bottom-6 ou 24px)
+                if(wppBtn) wppBtn.style.bottom = '1.5rem';
+            }
+
             // SWIPERS
             new Swiper('.productSwiper', { slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false }, navigation: { nextEl: '.productSwiper .swiper-button-next', prevEl: '.productSwiper .swiper-button-prev' }, pagination: { el: '.productSwiper .swiper-pagination', clickable: true }, breakpoints: { 768: { slidesPerView: 2, spaceBetween: 20 }, 1024: { slidesPerView: 3, spaceBetween: 30 } } });
             new Swiper('.swiperAlimentos', { slidesPerView: 1, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false }, navigation: { nextEl: '.alimentos-next', prevEl: '.alimentos-prev' }, pagination: { el: '.swiperAlimentos .swiper-pagination', clickable: true }, breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
@@ -676,18 +859,15 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             let itensOrcamento = [];
 
             function atualizarWizard() {
-                // Esconde todas as etapas
                 document.querySelectorAll('.wizard-step').forEach(el => {
                     el.classList.add('hidden');
                     el.classList.remove('block', 'animate-step');
                 });
                 
-                // Exibe a etapa atual com animação
                 const stepView = document.getElementById('step-' + stepAtual);
                 stepView.classList.remove('hidden');
                 stepView.classList.add('block', 'animate-step');
                 
-                // Atualiza indicadores (bolinhas)
                 for(let i=1; i<=3; i++) {
                     const ind = document.getElementById('indicator-' + i);
                     const txt = document.getElementById('text-indicator-' + i);
@@ -702,7 +882,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     }
                 }
                 
-                // Atualiza barra de progresso horizontal
                 const progress = document.getElementById('wizard-progress');
                 if(stepAtual === 1) progress.style.width = '0%';
                 if(stepAtual === 2) progress.style.width = '50%';
@@ -715,7 +894,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 
                 let valid = true;
                 
-                // Validação nativa do HTML5
                 inputs.forEach(inp => {
                     if(!inp.checkValidity()) {
                         inp.reportValidity();
@@ -723,7 +901,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     }
                 });
 
-                // Validação do carrinho na etapa 2
                 if (valid && step === 2) {
                     if (itensOrcamento.length === 0) {
                         alert("Por favor, adicione pelo menos uma caixa ao seu pedido antes de avançar.");
@@ -840,7 +1017,6 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             function prepararEnvio(event) {
                 event.preventDefault();
                 
-                // Redundância de segurança para o último botão
                 if(itensOrcamento.length === 0) {
                     alert("Adicione pelo menos uma caixa ao carrinho.");
                     return;
