@@ -105,6 +105,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             .slot-1 { top: 0; left: 0; width: 100%; height: 58%; z-index: 10; }
             .slot-2 { bottom: 0; left: 0; width: 48%; height: 38%; z-index: 1; }
             .slot-3 { bottom: 0; right: 0; width: 48%; height: 38%; z-index: 1; }
+            
+            /* Animação do Wizard */
+            @keyframes stepFadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+            .animate-step { animation: stepFadeIn 0.3s ease-out forwards; }
         </style>
     </head>
     <body class="text-gray-800 antialiased selection:bg-brand selection:text-white">
@@ -232,58 +236,58 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
-        <section id="sobre" class="py-16 md:py-24 bg-darkBg text-white relative overflow-hidden">
+        <section id="sobre" class="py-12 md:py-16 bg-darkBg text-white relative overflow-hidden">
             <div class="absolute top-0 right-0 -mr-40 -mt-40 w-80 h-80 rounded-full bg-brand opacity-20 blur-[100px]"></div>
             
             <div class="container mx-auto max-w-6xl px-6 lg:px-16 relative z-10">
-                <div class="text-center mb-12" data-aos="fade-up">
-                    <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-5 py-2 rounded-lg text-xs font-bold tracking-widest uppercase mb-4">
-                        <i class="fa-solid fa-location-dot mr-2 text-brand"></i> Camaçari - BA
+                <div class="text-center mb-10" data-aos="fade-up">
+                    <div class="inline-block bg-white/10 backdrop-blur border border-white/20 px-4 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase mb-3">
+                        <i class="fa-solid fa-location-dot mr-1.5 text-brand"></i> Camaçari - BA
                     </div>
-                    <h2 class="text-3xl md:text-5xl font-black mb-6 tracking-tight">Sobre a Ecocaixas</h2>
+                    <h2 class="text-2xl md:text-4xl font-black mb-4 tracking-tight">Sobre a Ecocaixas</h2>
                 </div>
 
-                <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-20">
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center mb-12">
                     <div data-aos="fade-right" data-aos-duration="1000">
-                        <h3 class="text-2xl md:text-3xl font-bold mb-5 text-white border-l-4 border-brand pl-4">${tituloEmpresa}</h3>
-                        <div class="space-y-4 text-gray-300 text-base md:text-lg leading-relaxed text-justify mb-8">
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 text-white border-l-4 border-brand pl-3">${tituloEmpresa}</h3>
+                        <div class="space-y-3 text-gray-300 text-sm md:text-base leading-relaxed text-justify mb-6">
                             <p>${textoEmpresa}</p>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4 md:gap-6" id="stats-container">
-                            <div class="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl backdrop-blur transition-colors text-center">
-                                <div class="text-4xl md:text-5xl font-black mb-2 text-brand flex justify-center">
+                        <div class="grid grid-cols-2 gap-4" id="stats-container">
+                            <div class="bg-white/5 border border-white/10 p-5 rounded-xl backdrop-blur transition-colors text-center">
+                                <div class="text-3xl md:text-4xl font-black mb-1 text-brand flex justify-center">
                                     <span class="contador" data-target="${anosAlvo}">0</span>
                                 </div>
-                                <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Anos de História</span>
+                                <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Anos de História</span>
                             </div>
-                            <div class="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl backdrop-blur transition-colors text-center">
-                                <div class="text-4xl md:text-5xl font-black mb-2 text-brand flex justify-center items-center">
+                            <div class="bg-white/5 border border-white/10 p-5 rounded-xl backdrop-blur transition-colors text-center">
+                                <div class="text-3xl md:text-4xl font-black mb-1 text-brand flex justify-center items-center">
                                     <span class="contador" data-target="${caixasAlvo}">0</span>
-                                    <span class="text-3xl ml-1">M+</span>
+                                    <span class="text-xl md:text-2xl ml-1">M+</span>
                                 </div>
-                                <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Caixas Produzidas</span>
+                                <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-400">Caixas Produzidas</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mosaico-container h-72 md:h-[450px]" data-aos="fade-left" data-aos-duration="1200">
+                    <div class="mosaico-container h-64 md:h-[380px]" data-aos="fade-left" data-aos-duration="1200">
                         <img id="mosaico-1" src="${empresaInfo.img_mosaico_1 || 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&h=800&fit=crop'}" class="mosaico-img slot-1">
                         <img id="mosaico-2" src="${empresaInfo.img_mosaico_2 || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=400&fit=crop'}" class="mosaico-img slot-2">
                         <img id="mosaico-3" src="${empresaInfo.img_mosaico_3 || 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?w=500&h=400&fit=crop'}" class="mosaico-img slot-3">
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-brand to-brandDark rounded-xl p-6 md:p-10 shadow-xl relative overflow-hidden mx-auto" data-aos="fade-up">
-                    <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8 relative z-10">
-                        <div class="md:w-1/3 text-white">
-                            <h3 class="text-2xl md:text-3xl font-black mb-3 leading-tight">Mural da Fábrica</h3>
+                <div class="bg-gradient-to-br from-brand to-brandDark rounded-xl p-5 md:p-8 shadow-xl relative overflow-hidden mx-auto" data-aos="fade-up">
+                    <div class="flex flex-col md:flex-row items-center gap-5 md:gap-6 relative z-10">
+                        <div class="md:w-1/3 text-white text-center md:text-left">
+                            <h3 class="text-xl md:text-2xl font-black mb-2 leading-tight">Mural da Fábrica</h3>
                             <p class="text-brandLight text-xs md:text-sm opacity-90">Deslize para ver novidades, recados da diretoria e promoções.</p>
                         </div>
                         <div class="md:w-2/3 w-full">
                             <div class="swiper newsSwiper">
-                                <div class="swiper-wrapper pb-8 md:pb-10">
-                                    ${noticiasSlides || '<div class="swiper-slide bg-white/20 p-6 rounded-xl text-white text-center backdrop-blur border border-white/10">Nenhuma atualização no momento.</div>'}
+                                <div class="swiper-wrapper pb-8">
+                                    ${noticiasSlides || '<div class="swiper-slide bg-white/20 p-5 rounded-xl text-white text-center backdrop-blur border border-white/10 text-sm">Nenhuma atualização no momento.</div>'}
                                 </div>
                                 <div class="swiper-pagination"></div>
                             </div>
@@ -293,106 +297,148 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             </div>
         </section>
 
+        <!-- SEÇÃO ORÇAMENTO WIZARD -->
         <section id="contato" class="py-16 md:py-20 bg-gray-50 relative">
-            <div class="container mx-auto max-w-4xl px-6 relative z-10">
-                <div class="text-center mb-12" data-aos="fade-down">
-                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">Monte seu Pedido</h2>
-                    <p class="text-gray-500 text-sm md:text-base">Processo rápido e direto para o WhatsApp do seu setor em Camaçari.</p>
+            <div class="container mx-auto max-w-3xl px-6 relative z-10">
+                <div class="text-center mb-10" data-aos="fade-down">
+                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 tracking-tight">Monte seu Pedido</h2>
+                    <p class="text-gray-500 text-sm md:text-base">Processo rápido e direto para o WhatsApp do seu setor.</p>
                 </div>
 
-                <form id="formContato" class="bg-white p-6 md:p-10 rounded-xl shadow-md border border-gray-200" onsubmit="prepararEnvio(event)" data-aos="fade-up" data-aos-delay="200">
+                <!-- Stepper Visual -->
+                <div class="flex items-center justify-between mb-8 relative max-w-lg mx-auto" data-aos="fade-up">
+                    <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded-full">
+                        <div id="wizard-progress" class="h-full bg-brand transition-all duration-300 w-0 rounded-full"></div>
+                    </div>
                     
-                    <div class="mb-8">
-                        <h3 class="text-base md:text-lg font-black text-gray-900 mb-5 flex items-center"><span class="bg-gray-100 text-brand w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center mr-3 text-xs md:text-sm">1</span> Dados da Empresa</h3>
-                        <div class="grid md:grid-cols-2 gap-5">
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div id="indicator-1" class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center font-bold border-4 border-white shadow-sm transition-colors text-sm">1</div>
+                        <span id="text-indicator-1" class="text-[10px] md:text-xs font-bold mt-2 text-gray-800 transition-colors">Dados</span>
+                    </div>
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div id="indicator-2" class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold border-4 border-white shadow-sm transition-colors text-sm">2</div>
+                        <span id="text-indicator-2" class="text-[10px] md:text-xs font-bold mt-2 text-gray-400 transition-colors">Pedido</span>
+                    </div>
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div id="indicator-3" class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold border-4 border-white shadow-sm transition-colors text-sm">3</div>
+                        <span id="text-indicator-3" class="text-[10px] md:text-xs font-bold mt-2 text-gray-400 transition-colors">Envio</span>
+                    </div>
+                </div>
+
+                <form id="formContato" class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-200" onsubmit="prepararEnvio(event)" data-aos="fade-up" data-aos-delay="100">
+                    
+                    <!-- PASSO 1: DADOS -->
+                    <div id="step-1" class="wizard-step block animate-step">
+                        <h3 class="text-lg md:text-xl font-black text-gray-900 mb-5 border-b border-gray-100 pb-3">Dados de Contato</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nome da Empresa</label>
-                                <input class="w-full bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nome da Empresa</label>
+                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="empresa" required placeholder="Ex: Mercado Silva LTDA">
                             </div>
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Seu Nome e Contato</label>
-                                <input class="w-full bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Seu Nome e Contato</label>
+                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" type="text" id="contatoNome" required placeholder="João - (71) 90000-0000">
                             </div>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                        <div class="grid md:grid-cols-2 gap-4 mt-4">
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instagram (Opcional)</label>
-                                <input class="w-full bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium disabled:opacity-50 transition-colors" type="text" id="instagram" placeholder="@suaempresa">
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Instagram (Opcional)</label>
+                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium disabled:opacity-50 transition-colors" type="text" id="instagram" placeholder="@suaempresa">
                                 <label class="flex items-center text-xs text-gray-500 mt-2 cursor-pointer select-none">
                                     <input type="checkbox" id="checkInsta" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-3.5 h-3.5" onchange="toggleField('instagram', this.checked)"> Não possuo
                                 </label>
                             </div>
                             <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Site / App (Opcional)</label>
-                                <input class="w-full bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium disabled:opacity-50 transition-colors" type="text" id="site" placeholder="www.suaempresa.com.br">
+                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Site / App (Opcional)</label>
+                                <input class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium disabled:opacity-50 transition-colors" type="text" id="site" placeholder="www.suaempresa.com.br">
                                 <label class="flex items-center text-xs text-gray-500 mt-2 cursor-pointer select-none">
                                     <input type="checkbox" id="checkSite" class="mr-2 rounded text-brand focus:ring-brand border-gray-300 w-3.5 h-3.5" onchange="toggleField('site', this.checked)"> Não possuo
                                 </label>
                             </div>
                         </div>
+
+                        <div class="mt-8 flex justify-end">
+                            <button type="button" onclick="nextStep(1)" class="w-full md:w-auto bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-brand transition-colors text-sm flex items-center justify-center">Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        </div>
                     </div>
 
-                    <div class="mb-8">
-                        <h3 class="text-base md:text-lg font-black text-gray-900 mb-5 flex items-center"><span class="bg-gray-100 text-brand w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center mr-3 text-xs md:text-sm">2</span> Direcionamento</h3>
-                        <div class="bg-brandLight/50 p-5 rounded-lg border border-brand/30">
-                            <label class="block text-sm font-bold text-gray-900 mb-3">Qual o Segmento Principal da sua Empresa?</label>
-                            <select class="w-full bg-white px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand font-medium text-gray-800 text-sm transition-colors" id="setorPrincipal" required>
+                    <!-- PASSO 2: PEDIDO E ITENS -->
+                    <div id="step-2" class="wizard-step hidden">
+                        <h3 class="text-lg md:text-xl font-black text-gray-900 mb-5 border-b border-gray-100 pb-3">Detalhes do Pedido</h3>
+                        
+                        <div class="bg-brandLight/50 p-4 rounded-lg border border-brand/30 mb-6">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Qual o Segmento Principal da sua Empresa?</label>
+                            <select class="w-full bg-white px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand font-medium text-gray-800 text-sm transition-colors" id="setorPrincipal" required>
                                 <option value="" disabled selected>Selecione uma opção...</option>
                                 <option value="alimenticio">Ramo Alimentício</option>
                                 <option value="industrial">Ramo Industrial</option>
                             </select>
                         </div>
+
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-base md:text-lg font-bold text-gray-800">Itens do Orçamento</h4>
+                                <button type="button" onclick="abrirModalCaixa()" class="bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-brand transition-colors flex items-center shadow-sm">
+                                    <i class="fa-solid fa-plus mr-1.5"></i> Caixa
+                                </button>
+                            </div>
+                            <div id="listaPedidos" class="space-y-3">
+                                <div class="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-500 font-medium text-sm" id="emptyState">
+                                    Seu carrinho está vazio. Adicione os modelos acima.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col md:flex-row justify-between gap-3">
+                            <button type="button" onclick="prevStep()" class="w-full md:w-auto bg-gray-100 text-gray-600 font-bold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center justify-center order-2 md:order-1"><i class="fa-solid fa-arrow-left mr-2"></i> Voltar</button>
+                            <button type="button" onclick="nextStep(2)" class="w-full md:w-auto bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-brand transition-colors text-sm flex items-center justify-center order-1 md:order-2">Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        </div>
                     </div>
 
-                    <div class="mb-8">
-                        <div class="flex justify-between items-center mb-5">
-                            <h3 class="text-base md:text-lg font-black text-gray-900 flex items-center"><span class="bg-gray-100 text-brand w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center mr-3 text-xs md:text-sm">3</span> Itens do Pedido</h3>
-                            <button type="button" onclick="abrirModalCaixa()" class="bg-gray-900 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand transition-colors flex items-center shadow-sm">
-                                <i class="fa-solid fa-plus mr-2"></i> Caixa
+                    <!-- PASSO 3: FINALIZAÇÃO -->
+                    <div id="step-3" class="wizard-step hidden">
+                        <h3 class="text-lg md:text-xl font-black text-gray-900 mb-5 border-b border-gray-100 pb-3">Finalização e Pagamento</h3>
+                        
+                        <div class="mb-6">
+                            <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
+                            <textarea class="w-full bg-gray-50 px-3.5 py-2.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4 md:p-5 mb-6 bg-gray-50/50">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center text-sm md:text-base"><i class="fa-solid fa-credit-card text-brand mr-2"></i> Pagamento</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1.5">Forma de Pagamento</label>
+                                    <select id="formaPagamento" class="w-full bg-white px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors" required onchange="toggleBandeirasCartao()">
+                                        <option value="" disabled selected>Selecione...</option>
+                                        <option value="À vista (Pix/Transferência)">À vista (Pix/Transferência)</option>
+                                        <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                        <option value="Cartão de Débito">Cartão de Débito</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="containerBandeira" class="hidden">
+                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1.5">Bandeira do Cartão</label>
+                                    <select id="bandeiraCartao" class="w-full bg-white px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors">
+                                        <option value="" disabled selected>Selecione a bandeira...</option>
+                                        <option value="Visa">Visa</option>
+                                        <option value="Mastercard">Mastercard</option>
+                                        <option value="Elo">Elo</option>
+                                        <option value="Hipercard">Hipercard</option>
+                                        <option value="American Express">American Express</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col md:flex-row justify-between gap-3">
+                            <button type="button" onclick="prevStep()" class="w-full md:w-auto bg-gray-100 text-gray-600 font-bold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-colors text-sm flex items-center justify-center order-2 md:order-1"><i class="fa-solid fa-arrow-left mr-2"></i> Voltar</button>
+                            <button type="submit" class="w-full md:w-auto px-6 py-2.5 flex justify-center items-center bg-[#25D366] hover:bg-[#1fae53] text-white font-bold rounded-lg transition-colors shadow-sm text-sm order-1 md:order-2">
+                                <i class="fa-brands fa-whatsapp text-base mr-2"></i> Enviar pelo WhatsApp
                             </button>
                         </div>
-                        <div id="listaPedidos" class="space-y-3">
-                            <div class="text-center p-6 md:p-8 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-500 font-medium text-sm" id="emptyState">
-                                Seu carrinho está vazio. Adicione os modelos de caixa acima.
-                            </div>
-                        </div>
                     </div>
 
-                    <div class="mb-8">
-                        <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Observações (Opcional)</label>
-                        <textarea class="w-full bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 focus:ring-1 focus:ring-brand focus:border-brand focus:bg-white text-gray-900 text-sm font-medium transition-colors" id="descricaoGeral" rows="2" placeholder="Ex: Precisamos de impressão da logomarca..."></textarea>
-                    </div>
-
-                    <div class="mt-6 border border-gray-200 rounded-lg p-5 md:p-6 mb-8 bg-gray-50/50">
-                        <h4 class="font-bold text-gray-800 mb-4 flex items-center text-sm md:text-base"><i class="fa-solid fa-credit-card text-brand mr-2"></i> Pagamento</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">Forma de Pagamento</label>
-                                <select id="formaPagamento" class="w-full bg-white px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors" required onchange="toggleBandeirasCartao()">
-                                    <option value="" disabled selected>Selecione...</option>
-                                    <option value="À vista (Pix/Transferência)">À vista (Pix/Transferência)</option>
-                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                    <option value="Cartão de Débito">Cartão de Débito</option>
-                                </select>
-                            </div>
-                            
-                            <div id="containerBandeira" class="hidden">
-                                <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">Bandeira do Cartão</label>
-                                <select id="bandeiraCartao" class="w-full bg-white px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-brand text-sm font-medium text-gray-900 outline-none transition-colors">
-                                    <option value="" disabled selected>Selecione a bandeira...</option>
-                                    <option value="Visa">Visa</option>
-                                    <option value="Mastercard">Mastercard</option>
-                                    <option value="Elo">Elo</option>
-                                    <option value="Hipercard">Hipercard</option>
-                                    <option value="American Express">American Express</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full md:w-auto px-8 py-3 mx-auto flex justify-center items-center bg-[#25D366] hover:bg-[#1fae53] text-white font-bold rounded-lg transition-colors shadow-md text-sm md:text-base">
-                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Solicitar orçamento
-                    </button>
                 </form>
             </div>
         </section>
@@ -581,6 +627,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
         
         <script>
+            // INICIALIZAÇÃO E ANIMAÇÕES
             const dbModelos = ${JSON.stringify(formModelos)};
             const dbMateriais = ${JSON.stringify(formMateriais)};
 
@@ -594,36 +641,13 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 }
             }, 4000);
 
-            new Swiper('.productSwiper', {
-                slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true,
-                autoplay: { delay: 4000, disableOnInteraction: false },
-                navigation: { nextEl: '.productSwiper .swiper-button-next', prevEl: '.productSwiper .swiper-button-prev' },
-                pagination: { el: '.productSwiper .swiper-pagination', clickable: true },
-                breakpoints: { 768: { slidesPerView: 2, spaceBetween: 20 }, 1024: { slidesPerView: 3, spaceBetween: 30 } }
-            });
+            // SWIPERS
+            new Swiper('.productSwiper', { slidesPerView: 1, centeredSlides: true, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false }, navigation: { nextEl: '.productSwiper .swiper-button-next', prevEl: '.productSwiper .swiper-button-prev' }, pagination: { el: '.productSwiper .swiper-pagination', clickable: true }, breakpoints: { 768: { slidesPerView: 2, spaceBetween: 20 }, 1024: { slidesPerView: 3, spaceBetween: 30 } } });
+            new Swiper('.swiperAlimentos', { slidesPerView: 1, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false }, navigation: { nextEl: '.alimentos-next', prevEl: '.alimentos-prev' }, pagination: { el: '.swiperAlimentos .swiper-pagination', clickable: true }, breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
+            new Swiper('.swiperIndustrial', { slidesPerView: 1, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false, reverseDirection: true }, navigation: { nextEl: '.ind-next', prevEl: '.ind-prev' }, pagination: { el: '.swiperIndustrial .swiper-pagination', clickable: true }, breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } } });
+            new Swiper('.newsSwiper', { slidesPerView: 1, spaceBetween: 20, loop: true, autoplay: { delay: 4000, disableOnInteraction: false }, pagination: { el: '.newsSwiper .swiper-pagination', clickable: true } });
 
-            new Swiper('.swiperAlimentos', {
-                slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 4000, disableOnInteraction: false },
-                navigation: { nextEl: '.alimentos-next', prevEl: '.alimentos-prev' },
-                pagination: { el: '.swiperAlimentos .swiper-pagination', clickable: true },
-                breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
-            });
-
-            new Swiper('.swiperIndustrial', {
-                slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 4000, disableOnInteraction: false, reverseDirection: true },
-                navigation: { nextEl: '.ind-next', prevEl: '.ind-prev' },
-                pagination: { el: '.swiperIndustrial .swiper-pagination', clickable: true },
-                breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
-            });
-            
-            new Swiper('.newsSwiper', { 
-                slidesPerView: 1, spaceBetween: 20, loop: true,
-                autoplay: { delay: 4000, disableOnInteraction: false }, 
-                pagination: { el: '.newsSwiper .swiper-pagination', clickable: true } 
-            });
-
+            // CONTADORES
             const counters = document.querySelectorAll('.contador'); let hasAnimated = false;
             const animateCounters = () => {
                 counters.forEach(counter => {
@@ -636,10 +660,7 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     }; updateCount();
                 });
             };
-
-            const observer = new IntersectionObserver((entries) => {
-                if(entries[0].isIntersecting && !hasAnimated) { animateCounters(); hasAnimated = true; }
-            }, { threshold: 0.5 });
+            const observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting && !hasAnimated) { animateCounters(); hasAnimated = true; } }, { threshold: 0.5 });
             const statsContainer = document.getElementById('stats-container');
             if(statsContainer) observer.observe(statsContainer);
 
@@ -648,8 +669,82 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 field.disabled = isChecked; if(isChecked) field.value = '';
             }
 
+            // =====================================
+            // LÓGICA DO WIZARD (FORMULÁRIO MULTI-STEP)
+            // =====================================
+            let stepAtual = 1;
             let itensOrcamento = [];
 
+            function atualizarWizard() {
+                // Esconde todas as etapas
+                document.querySelectorAll('.wizard-step').forEach(el => {
+                    el.classList.add('hidden');
+                    el.classList.remove('block', 'animate-step');
+                });
+                
+                // Exibe a etapa atual com animação
+                const stepView = document.getElementById('step-' + stepAtual);
+                stepView.classList.remove('hidden');
+                stepView.classList.add('block', 'animate-step');
+                
+                // Atualiza indicadores (bolinhas)
+                for(let i=1; i<=3; i++) {
+                    const ind = document.getElementById('indicator-' + i);
+                    const txt = document.getElementById('text-indicator-' + i);
+                    if(i <= stepAtual) {
+                        ind.classList.replace('bg-gray-200', 'bg-brand');
+                        ind.classList.replace('text-gray-500', 'text-white');
+                        txt.classList.replace('text-gray-400', 'text-gray-800');
+                    } else {
+                        ind.classList.replace('bg-brand', 'bg-gray-200');
+                        ind.classList.replace('text-white', 'text-gray-500');
+                        txt.classList.replace('text-gray-800', 'text-gray-400');
+                    }
+                }
+                
+                // Atualiza barra de progresso horizontal
+                const progress = document.getElementById('wizard-progress');
+                if(stepAtual === 1) progress.style.width = '0%';
+                if(stepAtual === 2) progress.style.width = '50%';
+                if(stepAtual === 3) progress.style.width = '100%';
+            }
+
+            function nextStep(step) {
+                const stepEl = document.getElementById('step-' + step);
+                const inputs = stepEl.querySelectorAll('input[required], select[required], textarea[required]');
+                
+                let valid = true;
+                
+                // Validação nativa do HTML5
+                inputs.forEach(inp => {
+                    if(!inp.checkValidity()) {
+                        inp.reportValidity();
+                        valid = false;
+                    }
+                });
+
+                // Validação do carrinho na etapa 2
+                if (valid && step === 2) {
+                    if (itensOrcamento.length === 0) {
+                        alert("Por favor, adicione pelo menos uma caixa ao seu pedido antes de avançar.");
+                        valid = false;
+                    }
+                }
+
+                if(valid) {
+                    stepAtual++;
+                    atualizarWizard();
+                }
+            }
+
+            function prevStep() {
+                stepAtual--;
+                atualizarWizard();
+            }
+
+            // =====================================
+            // MODAL E LISTA DE CAIXAS (PEDIDO)
+            // =====================================
             function abrirModalCaixa() {
                 document.getElementById('formAddCaixa').reset();
                 document.getElementById('itemModelo').disabled = true; 
@@ -680,21 +775,12 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                     selectMaterial.disabled = false;
                     
                     const modelosFiltrados = dbModelos.filter(m => m.secao === setor);
-                    if(modelosFiltrados.length === 0) {
-                        selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
-                    }
-                    
-                    modelosFiltrados.forEach(mod => { 
-                        selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}</option>\`; 
-                    });
+                    if(modelosFiltrados.length === 0) selectModelo.innerHTML = '<option value="" disabled>Nenhum modelo cadastrado.</option>';
+                    modelosFiltrados.forEach(mod => { selectModelo.innerHTML += \`<option value="\${mod.nome}" data-tamanho="\${mod.tamanho}">\${mod.nome}</option>\`; });
 
                     const materiaisFiltrados = dbMateriais.filter(m => m.secao === setor || m.secao === 'ambos');
-                    if(materiaisFiltrados.length === 0) {
-                        selectMaterial.innerHTML = '<option value="" disabled>Nenhum material cadastrado.</option>';
-                    }
-                    materiaisFiltrados.forEach(mat => { 
-                        selectMaterial.innerHTML += \`<option value="\${mat.nome}">\${mat.nome}</option>\`; 
-                    });
+                    if(materiaisFiltrados.length === 0) selectMaterial.innerHTML = '<option value="" disabled>Nenhum material cadastrado.</option>';
+                    materiaisFiltrados.forEach(mat => { selectMaterial.innerHTML += \`<option value="\${mat.nome}">\${mat.nome}</option>\`; });
                 }
             }
 
@@ -722,21 +808,16 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 
                 if(itensOrcamento.length === 0) { 
                     container.innerHTML = ''; 
-                    if(emptyState) {
-                        container.appendChild(emptyState); 
-                        emptyState.style.display = 'block'; 
-                    }
+                    if(emptyState) { container.appendChild(emptyState); emptyState.style.display = 'block'; }
                     return; 
                 }
                 
-                if(emptyState) {
-                    emptyState.style.display = 'none'; 
-                }
+                if(emptyState) emptyState.style.display = 'none'; 
                 
                 let html = '';
                 itensOrcamento.forEach((item, index) => {
                     html += \`
-                    <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 mt-3">
+                    <div class="bg-white p-3 md:p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 mt-3">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-lg \${item.setor.includes('Alimentício') ? 'bg-brandLight text-brand' : 'bg-gray-100 text-gray-800'} flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-box"></i></div>
                             <div>
@@ -750,12 +831,16 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 
                 container.innerHTML = '';
                 if(emptyState) container.appendChild(emptyState);
-                
                 container.insertAdjacentHTML('beforeend', html);
             }
 
+            // =====================================
+            // ENVIO PARA O WHATSAPP E FECHAMENTOS
+            // =====================================
             function prepararEnvio(event) {
                 event.preventDefault();
+                
+                // Redundância de segurança para o último botão
                 if(itensOrcamento.length === 0) {
                     alert("Adicione pelo menos uma caixa ao carrinho.");
                     return;
@@ -802,17 +887,12 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             if (popupAtivoHTML) {
                 setTimeout(() => {
                     popupAtivoHTML.classList.remove('hidden');
-                    setTimeout(() => {
-                        popupAtivoHTML.classList.remove('opacity-0');
-                        document.getElementById('popupContentBody').classList.remove('scale-95');
-                    }, 50);
+                    setTimeout(() => { popupAtivoHTML.classList.remove('opacity-0'); document.getElementById('popupContentBody').classList.remove('scale-95'); }, 50);
                 }, 1000);
             }
-
             function fecharPopupInicial() {
                 if(popupAtivoHTML) {
-                    popupAtivoHTML.classList.add('opacity-0');
-                    document.getElementById('popupContentBody').classList.add('scale-95');
+                    popupAtivoHTML.classList.add('opacity-0'); document.getElementById('popupContentBody').classList.add('scale-95');
                     setTimeout(() => popupAtivoHTML.classList.add('hidden'), 400);
                 }
             }
@@ -821,17 +901,12 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
             if (modalVagaHTML) {
                 setTimeout(() => {
                     modalVagaHTML.classList.remove('hidden');
-                    setTimeout(() => {
-                        modalVagaHTML.classList.remove('opacity-0');
-                        document.getElementById('modalVagaContent').classList.remove('scale-95');
-                    }, 50);
+                    setTimeout(() => { modalVagaHTML.classList.remove('opacity-0'); document.getElementById('modalVagaContent').classList.remove('scale-95'); }, 50);
                 }, 1500);
             }
-
             function fecharModalVaga() {
                 if(modalVagaHTML) {
-                    modalVagaHTML.classList.add('opacity-0');
-                    document.getElementById('modalVagaContent').classList.add('scale-95');
+                    modalVagaHTML.classList.add('opacity-0'); document.getElementById('modalVagaContent').classList.add('scale-95');
                     setTimeout(() => modalVagaHTML.classList.add('hidden'), 400);
                 }
             }
@@ -841,12 +916,10 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 const icon = document.querySelector('#mobileMenuBtn i');
                 
                 if (menu.classList.contains('scale-y-0')) {
-                    menu.classList.remove('scale-y-0', 'opacity-0');
-                    menu.classList.add('scale-y-100', 'opacity-100');
+                    menu.classList.remove('scale-y-0', 'opacity-0'); menu.classList.add('scale-y-100', 'opacity-100');
                     icon.classList.replace('fa-bars', 'fa-xmark');
                 } else {
-                    menu.classList.add('scale-y-0', 'opacity-0');
-                    menu.classList.remove('scale-y-100', 'opacity-100');
+                    menu.classList.add('scale-y-0', 'opacity-0'); menu.classList.remove('scale-y-100', 'opacity-100');
                     icon.classList.replace('fa-xmark', 'fa-bars');
                 }
             }
@@ -857,12 +930,9 @@ module.exports = function renderHome(stats, noticias, produtos = [], empresaInfo
                 const bandeiraCartao = document.getElementById('bandeiraCartao');
                 
                 if (forma.includes('Cartão')) {
-                    containerBandeira.classList.remove('hidden');
-                    bandeiraCartao.required = true;
+                    containerBandeira.classList.remove('hidden'); bandeiraCartao.required = true;
                 } else {
-                    containerBandeira.classList.add('hidden');
-                    bandeiraCartao.required = false;
-                    bandeiraCartao.value = '';
+                    containerBandeira.classList.add('hidden'); bandeiraCartao.required = false; bandeiraCartao.value = '';
                 }
             }
         </script>
